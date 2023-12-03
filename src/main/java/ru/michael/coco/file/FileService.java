@@ -13,7 +13,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class FileService {
@@ -29,9 +28,15 @@ public class FileService {
         this.userRepository = userRepository;
     }
 
+    public void saveFiles(List<MultipartFile> files, Long userId) throws IOException {
+        for (MultipartFile file : files) {
+            saveFile(file, userId);
+        }
+    }
+
     public void saveFile(MultipartFile file, Long userId) throws IOException {
         // Генерируем уникальное имя файла
-        String fileName = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
+        String fileName = file.getOriginalFilename();
         // Путь к директории, где будут храниться загруженные файлы
         Path uploadPath = Path.of(uploadDir);
         // Создаем директорию, если её нет
@@ -40,8 +45,9 @@ public class FileService {
         }
         // Полный путь к файлу
         Path filePath = uploadPath.resolve(fileName);
-        // Копируем файл в указанное место
+        Files.createDirectories(filePath.getParent());
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
         // Создаем запись в базе данных
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));

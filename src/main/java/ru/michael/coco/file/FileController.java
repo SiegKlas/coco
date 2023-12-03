@@ -3,26 +3,32 @@ package ru.michael.coco.file;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 import ru.michael.coco.user.UserEntity;
 import ru.michael.coco.user.UserRepository;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequestMapping("/files")
 public class FileController {
-    @Autowired
-    private FileService fileService;
+    private final FileService fileService;
+    private final UserRepository userRepository;
 
     @Autowired
-    private UserRepository userRepository;  // Добавлено поле userRepository
+    public FileController(FileService fileService, UserRepository userRepository) {
+        this.fileService = fileService;
+        this.userRepository = userRepository;
+    }
 
     @GetMapping
     public String listFiles(Model model, Principal principal) {
-        // Получение текущего пользователя из контекста Spring Security
         Long userId = getUserIdFromPrincipal(principal);
         model.addAttribute("files", fileService.getFilesByUser(userId));
         return "fileList";
@@ -34,15 +40,13 @@ public class FileController {
     }
 
     @PostMapping("/upload")
-    public String handleFileUpload(@RequestParam("file") MultipartFile file, Principal principal) throws IOException {
-        // Получение текущего пользователя из контекста Spring Security
+    public String handleFileUpload(@RequestPart("file") List<MultipartFile> files, Principal principal) throws IOException {
         Long userId = getUserIdFromPrincipal(principal);
-        fileService.saveFile(file, userId);
+        fileService.saveFiles(files, userId);
         return "redirect:/files";
     }
 
     private Long getUserIdFromPrincipal(Principal principal) {
-        // Получение текущего пользователя из контекста Spring Security
         String username = principal.getName();
         UserEntity user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
