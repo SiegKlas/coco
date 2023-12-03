@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Bank</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-3">
+    <h1>Edit Bank</h1>
+    <form method="post" th:action="@{/admin/banks/update}">
+        <input name="bankId" th:value="${bank.id}" type="hidden">
+        <div class="form-group">
+            <label for="bankName">Bank Name</label>
+            <input class="form-control" id="bankName" name="bankName" required th:value="${bank.name}" type="text">
+        </div>
+        <button class="btn btn-success" type="submit">Update Bank</button>
+    </form>
+</div>
+</body>
+</html>

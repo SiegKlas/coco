@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Bank</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-3">
+    <h1>Edit Bank</h1>
+    <a class="btn btn-secondary" th:href="@{'/admin/groups/banks?groupid=' + ${groupId}}">Back</a>
+    <table class="table mt-3">
+        <thead>
+        <tr>
+            <th>Topic Name</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="topic : ${topics}">
+            <td th:text="${topic.name}"></td>
+            <td>
+                <a class="btn btn-primary" th:href="@{/admin/groups/topics/edit(topicId=${topic.id})}">Edit</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-success" onclick="showCreateTopicModal()">New Topic</button>
+    <form method="post" style="margin-top: 10px;" th:action="@{/admin/groups/banks/generate}">
+        <input name="bankid" th:value="${bankId}" type="hidden">
+        <button class="btn btn-primary" type="submit">Generate Bank</button>
+    </form>
+</div>
+
+<!-- Create Topic Modal -->
+<div aria-hidden="true" aria-labelledby="createTopicModalLabel" class="modal fade" id="createTopicModal" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" th:action="@{/admin/groups/topics/create}">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createTopicModalLabel">Create Topic</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input name="bankStructureId" th:value="${bankStructureId}" type="hidden">
+                    <div class="form-group">
+                        <label for="topicName">Topic Name</label>
+                        <input class="form-control" id="topicName" name="name" required type="text">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-primary" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showCreateTopicModal() {
+        $('#createTopicModal').modal('show');
+    }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

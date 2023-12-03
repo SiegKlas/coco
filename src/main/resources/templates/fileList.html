@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>File List</title>
+</head>
+<body>
+<h2>File List</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>File Name</th>
+        <th>Upload Time</th>
+    </tr>
+    <tr th:each="file : ${files}">
+        <td th:text="${file.id}"></td>
+        <td th:text="${file.fileName}"></td>
+        <td th:text="${file.uploadTime}"></td>
+    </tr>
+</table>
+<a th:href="@{/files/upload}">Upload a File</a>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Tasks</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .task-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+
+        .task-item {
+            margin: 10px 0;
+        }
+
+        .task-title {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+
+        .btn-tasks {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-tasks:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="task-container">
+    <div class="task-title">Tasks</div>
+    <div class="task-item">
+        <span>Solved:</span>
+        <span th:text="${solved}">0</span>
+    </div>
+    <div class="task-item">
+        <span>Unsolved:</span>
+        <span th:text="${unsolved}">0</span>
+    </div>
+    <div class="task-item">
+        <span>Wrong:</span>
+        <span th:text="${errors}">0</span>
+    </div>
+    <a class="btn-tasks" th:href="@{/tasks}">Tasks</a>
+</div>
+
+</body>
+</html>

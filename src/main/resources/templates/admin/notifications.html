@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Notifications</title>
+</head>
+<body>
+<h1>Chat Notifications</h1>
+<div>
+    <table>
+        <thead>
+        <tr>
+            <th>Student</th>
+            <th>Link</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="chat : ${chats}">
+            <td th:text="${chat.chatters[1].username}">Student Name</td>
+            <td>
+                <a th:href="@{/admin/tasks(user=${chat.chatters[1].username}, topic=${chat.task.taskDescription.levelDescription.topicDescription.number}, level=${chat.task.taskDescription.levelDescription.number}, task=${chat.task.taskDescription.number})}"
+                   th:text="'Go to Chat'">Chat Link</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

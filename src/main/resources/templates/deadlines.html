@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Deadlines</title>
+    <link href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <style>
+        .topic-container {
+            margin-top: 10px;
+        }
+
+        .level-container {
+            margin-top: 10px;
+        }
+        .slider-label {
+            margin-bottom: 5px;
+        }
+        .slider {
+            width: 200px;
+        }
+        #datepicker {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Deadlines</h2>
+
+<form action="#" id="deadlinesForm" method="post" th:action="@{/admin/deadlines}">
+
+    <div th:if="${topics}">
+        <div th:if="${users}">
+            <select id="user" name="user">
+                <option value="">Select a user</option>
+                <option th:each="user : ${users}" th:text="${user.username}" th:value="${user.username}"></option>
+            </select>
+        </div>
+        <select id="topic" name="topic" style="display: none;">
+            <option value="">Select a topic</option>
+            <option th:each="topic : ${topics}" th:text="${topic.name}" th:value="${topic.number}"></option>
+        </select>
+
+        <div id="levelContainer" style="display: none;"></div>
+
+        <div id="datepicker" style="display: none;"></div>
+
+        <div class="topic-container" style="display: none;">
+            <label class="slider-label" for="passTopic">Topic pass:</label>
+            <input id="passTopic" name="passTopic" type="text">
+        </div>
+
+        <div class="level-container" style="display: none;">
+            <label class="slider-label" for="passLevel">Level pass:</label>
+            <input id="passLevel" name="passLevel" type="text">
+        </div>
+
+        <button id="submitButton" style="display: none;" type="button">Confirm</button>
+    </div>
+
+</form>
+
+<button id="globalButton" type="button">Global</button>
+<button id="studentsButton" type="button">Students</button>
+
+<script th:inline="javascript">
+    $(function () {
+        $("#passTopic, #passLevel").slider({
+            range: "min",
+            value: 0,
+            min: 0,
+            max: 100,
+            slide: function (event, ui) {
+                $(this).prev().val(ui.value);
+            }
+        });
+
+        $("#datepicker").datepicker();
+
+        $('#submitButton').click(function () {
+            var topic = $('#topic').val();
+            var level = $('#level').val();
+            var deadLine = $('#datepicker').datepicker("getDate");
+            var passTopic = $('#passTopic').val();
+            var passLevel = $('#passLevel').val();
+            var user = $('#user').val();
+
+            var url = user ? '/admin/deadlines/students' : '/admin/deadlines/global';
+
+            var data = {
+                topic: topic,
+                level: level,
+                deadLine: deadLine,
+                passTopic: passTopic,
+                passLevel: passLevel
+            };
+
+            if (user) {
+                data.user = user;
+            }
+
+            $.post(url, data)
+                .done(function (data) {
+                })
+                .fail(function () {
+                });
+        });
+
+        var $topic = $('#topic');
+
+        if ($('#user option').length > 1) {
+            console.log("user option")
+            $('#user').change(function () {
+                var selectedUser = $(this).val();
+                if (selectedUser !== "") {
+                    $topic.show();
+                } else {
+                    $topic.hide();
+                    $('#level, #datepicker, .topic-container, .level-container, #submitButton').hide();
+                }
+            });
+        } else {
+            $topic.show();
+        }
+
+        $topic.change(function () {
+            var topicNumber = $(this).val();
+            $('#levelContainer').empty();
+            $('#datepicker, .topic-container, .level-container, #submitButton').hide();
+            if (topicNumber !== "") {
+                fetch('/admin/deadlines/levels?topicNumber=' + topicNumber)
+                    .then(response => response.json())
+                    .then(data => {
+                        var select = $('<select>').attr('name', 'level').attr('id', 'level');
+                        $('<option>').attr('value', '').text('Select a level').appendTo(select);
+                        data.forEach(function (level) {
+                            $('<option>').attr('value', level.number).text('Level ' + level.number).appendTo(select);
+                        });
+                        $('#levelContainer').append(select).show();
+                        $('#datepicker, .topic-container, #submitButton').show();
+                        $('#level').change(function () {
+                            if ($(this).val() !== "") {
+                                $('.level-container').show();
+                            } else {
+                                $('.level-container').hide();
+                            }
+                        });
+                    });
+            }
+        });
+
+
+        $('#globalButton').click(function () {
+            window.location.href = '/admin/deadlines/global';
+        });
+        $('#studentsButton').click(function () {
+            window.location.href = '/admin/deadlines/students';
+        });
+    });
+</script>
+
+</body>
+</html>

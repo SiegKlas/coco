@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin File Management</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+<h2>Admin File Management</h2>
+<table>
+    <tr>
+        <th>File Name</th>
+        <th>User</th>
+        <th>Action</th>
+    </tr>
+
+</table>
+<form action="/admin/files/bank" method="post">
+    <button type="submit">Generate bank</button>
+</form>
+<button id="globalButton" type="button">Stats</button>
+</body>
+</html>
+<script>
+    $('#globalButton').click(function () {
+        window.location.href = '/admin/files/downloadCsv';
+    });
+</script>

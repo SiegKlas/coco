@@ -1,0 +1,35 @@
+spring:
+  mail:
+    host: smtp.yandex.ru
+    port: 587
+    username: pluginmichael@yandex.ru
+    password: qlmtwazzyhkhpedk
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  thymeleaf:
+    cache: false
+  datasource:
+    generate-unique-name: false
+    name: coco
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+file:
+  upload-dir: D:\diploma\robot\exfiles
+  xbank-dir: D:\diploma\robot\xbank
+  groups-dir: D:\diploma\coco\groups
+  creds: D:\diploma\coco\users\creds.csv
+  solutions: D:\diploma\coco\solutions

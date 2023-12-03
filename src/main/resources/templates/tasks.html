@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tasks</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        .list-container {
+            margin: 10px;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        .list-item {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .list-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .status-green {
+            background-color: #d4edda;
+        }
+
+        .status-red {
+            background-color: #f8d7da;
+        }
+
+        .status-light-green {
+            background-color: #e9f7ef;
+        }
+
+        .status-light-red {
+            background-color: #fce8e6;
+        }
+
+        .button-back {
+            display: inline-block;
+            margin: 10px 0;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .button-back:hover {
+            background-color: #0056b3;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        body {
+            margin: 0;
+            padding-top: 10px;
+            padding-left: 25px;
+            padding-right: 25px;
+            box-sizing: border-box;
+        }
+
+        .table {
+            border-collapse: collapse;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f4f4f4;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .table tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .status-light-gray {
+            background-color: #e0e0e0;
+        }
+
+        .list-item-1 {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .list-item-1:hover {
+            background-color: #e0e0e0;
+            cursor: default;
+        }
+
+
+    </style>
+</head>
+<body>
+<div th:if="${not #lists.isEmpty(groups)}">
+    <h2>Groups</h2>
+    <ul class="list-container">
+        <li class="list-item"
+            th:each="g : ${groups}"
+            th:onclick="'redirectTo(\'' + ${g.name} + '\', null, null, null)'"
+            th:text="${g.name}"></li>
+    </ul>
+</div>
+<div th:if="${selectedGroup != null}">
+    <h2>Topics</h2>
+    <ul class="list-container">
+        <li class="list-item"
+            th:each="t : ${topicDescriptionDTOS}"
+            th:onclick="'redirectTo(\'' + ${selectedGroup} + '\', ' + ${t.getNumber()} + ', null, null)'"
+            th:text="${t.getName()}"></li>
+    </ul>
+</div>
+<div th:if="${selectedGroup != null && not #lists.isEmpty(levelDescriptionDTOS)}">
+    <h2>Levels</h2>
+    <ul class="list-container">
+        <li class="list-item list-item-1"
+            th:classappend="${areLevelsLocked[iterStat.index]} ? 'status-light-gray' : ''"
+            th:each="l, iterStat : ${levelDescriptionDTOS}"
+            th:onclick="${areLevelsLocked[iterStat.index]} ? null : 'redirectTo(\'' + ${selectedGroup} + '\', ' + ${topicNumber} + ', ' + ${l.getNumber()} + ', null)'"
+            th:text="${l.getNumber()}"></li>
+    </ul>
+    <button class="button-back" th:onclick="'redirectTo(\'' + ${selectedGroup} + '\', null, null, null)'">Topics
+    </button>
+</div>
+
+<div th:if="${selectedGroup != null && not #lists.isEmpty(taskDescriptionDTOS)}">
+    <h2>Exercises</h2>
+    <ul class="list-container">
+        <li class="list-item"
+            th:classappend="${statuses[iterStat.index].name() == 'SUCCESS' ? 'status-green' :
+                            (statuses[iterStat.index].name() == 'FAIL' ? 'status-red' : '')}"
+            th:each="t, iterStat : ${taskDescriptionDTOS}"
+            th:onclick="'redirectTo(\'' + ${selectedGroup} + '\', ' + ${topicNumber} + ', ' + ${levelNumber} + ', ' + ${t.getNumber()} + ')'"
+            th:text="${t.getName()}">
+        </li>
+    </ul>
+    <button class="button-back"
+            th:onclick="'redirectTo(\'' + ${selectedGroup} + '\', ' + ${topicNumber} + ', null, null)'">Levels
+    </button>
+</div>
+<div th:if="${taskDescriptionDTO != null}">
+    <h2 th:text="'Task ' + ${dir_name}">Task</h2>
+    <button class="button-back"
+            th:onclick="'redirectTo(\'' + ${selectedGroup} + '\', ' + ${topicNumber} + '\', ' + ${levelNumber} + ', null)'">
+        Exercises
+    </button>
+    <div th:if="${dir_name != null}">
+        <iframe
+                height="600px"
+                loading="lazy"
+                th:src="@{/pdf/{dir_name}(dir_name=${dir_name})}"
+                title="PDF-file"
+                width="60%"
+        ></iframe>
+    </div>
+    <a class="btn btn-primary" th:href="@{/asm/{filename}(filename=${dir_name})}">Download asm File</a>
+    <h3>Upload Solution</h3>
+    <form action="/upload/solution" enctype="multipart/form-data" method="POST">
+        <input name="groupName" th:value="${selectedGroup}" type="hidden"/>
+        <input name="topicNumber" th:value="${topicNumber}" type="hidden"/>
+        <input name="levelNumber" th:value="${levelNumber}" type="hidden"/>
+        <input name="taskNumber" th:value="${taskNumber}" type="hidden"/>
+        <input name="dir_name" th:value="${dir_name}" type="hidden"/>
+        <input name="file" type="file"/>
+        <button type="submit">Upload</button>
+    </form>
+    <div id="chatContent"
+         th:attr="data-group-name=${selectedGroup},
+              data-topic-number=${topicNumber},
+              data-level-number=${levelNumber},
+              data-task-number=${taskNumber}">
+    </div>
+    <div th:if="${attempts.size() > 0}">
+        <h2>Previous Solutions</h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Status</th>
+                <th>Task</th>
+                <th>Solution</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:classappend="${attempt.response.status == 'success' ? 'status-light-green' :
+                                        (attempt.response.status == 'error' ? 'status-light-red' : '')}"
+                th:each="attempt, iterStat : ${attempts}">
+                <td th:text="${attempt.response.status}">Status</td>
+                <td th:style="'white-space: pre-line;'"
+                    th:utext="${#strings.replace(attempt.response.output, '\n', '<br/>')}">Output
+                </td>
+
+                <td>
+                    <a class="btn btn-primary"
+                       th:href="@{/solution/{filename}(filename=${file_names[iterStat.index]})}">Download</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    function redirectTo(group, topic, level, number) {
+        let url = '/tasks?group=' + group;
+        if (topic) {
+            url += '&topic=' + topic;
+            if (level) {
+                url += '&level=' + level;
+                if (number) {
+                    url += '&task=' + number;
+                }
+            }
+        }
+        window.location.href = url;
+    }
+
+    $(document).ready(function () {
+        var groupName = $("#chatContent").data("group-name");
+        var topicNumber = $("#chatContent").data("topic-number");
+        var levelNumber = $("#chatContent").data("level-number");
+        var taskNumber = $("#chatContent").data("task-number");
+
+        $.get("/chat?groupName=" + groupName + "&topicNumber=" + topicNumber + "&levelNumber=" + levelNumber + "&taskNumber=" + taskNumber, function (data) {
+            $("#chatContent").html(data);
+        });
+    });
+</script>
+</body>
+</html>

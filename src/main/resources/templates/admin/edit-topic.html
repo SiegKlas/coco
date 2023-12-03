@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Topic</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-3">
+    <h1>Edit Topic</h1>
+    <a class="btn btn-secondary" th:href="@{'/admin/groups/banks/edit?bankid=' + ${bankId}}">Back</a>
+    <table class="table mt-3">
+        <thead>
+        <tr>
+            <th>Level Number</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="level, iter : ${levels}">
+            <td th:text="${iter.index + 1}"></td>
+            <td>
+                <button class="btn btn-primary" th:onclick="'showEditLevelModal(' + ${level.id} + ')'">Edit</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-success" th:onclick="'addLevel(' + ${topicId} + ')'">+</button>
+</div>
+
+<!-- Edit Level Modal -->
+<div aria-hidden="true" aria-labelledby="editLevelModalLabel" class="modal fade" id="editLevelModal" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="editLevelForm" method="post" th:action="@{/admin/groups/levels/edit}">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editLevelModalLabel">Edit Level</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input id="levelId" name="levelId" type="hidden">
+                    <div class="form-group">
+                        <label for="exFiles">EX Files</label>
+                        <textarea class="form-control" id="exFiles" name="exFiles" required rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="directorySelect">Select Directory</label>
+                        <select class="form-control" id="directorySelect">
+                            <option value="">Select a directory</option>
+                            <option th:each="dir : ${directories}" th:text="${dir}" th:value="${dir}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dragDropArea">Drag and Drop EX Files Here</label>
+                        <div class="border p-4 text-center" id="dragDropArea">
+                            <p>Drag and Drop your EX files here</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
+                    <button class="btn btn-primary" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function addLevel(topicId) {
+        $.post('/admin/groups/levels/add', {topicid: topicId})
+            .done(function () {
+                location.reload();
+            });
+    }
+
+    function showEditLevelModal(levelId) {
+        $.get('/admin/groups/levels/' + levelId, function (data) {
+            $('#levelId').val(data.id);
+            $('#exFiles').val(data.exFiles.join('\n'));
+            $('#editLevelModal').modal('show');
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        let dragDropArea = document.getElementById('dragDropArea');
+        let exFilesInput = document.getElementById('exFiles');
+        let directorySelect = document.getElementById('directorySelect');
+
+        dragDropArea.addEventListener('dragover', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragDropArea.classList.add('dragging');
+        });
+
+        dragDropArea.addEventListener('dragleave', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragDropArea.classList.remove('dragging');
+        });
+
+        dragDropArea.addEventListener('drop', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dragDropArea.classList.remove('dragging');
+
+            let files = e.dataTransfer.files;
+            let directory = directorySelect.value;
+
+            if (!directory) {
+                alert("Please select a directory first.");
+                return;
+            }
+
+            for (let i = 0; i < files.length; i++) {
+                let filePath = directory + "/" + files[i].name;
+                exFilesInput.value += filePath + '\n';
+            }
+        });
+    });
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
