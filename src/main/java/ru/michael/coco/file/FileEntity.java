@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import ru.michael.coco.user.UserEntity;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @Entity
@@ -21,8 +20,8 @@ public class FileEntity {
 
     private String fileName;
     private String fileType;
-    @Lob
-    private byte[] data;
+
+    private String filePath;
     @ManyToOne
     private UserEntity user;
 
