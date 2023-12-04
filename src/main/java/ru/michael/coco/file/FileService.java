@@ -28,6 +28,7 @@ public class FileService {
         this.userRepository = userRepository;
     }
 
+    // admin only
     public void saveFiles(List<MultipartFile> files, Long userId) throws IOException {
         for (MultipartFile file : files) {
             saveFile(file, userId);
@@ -65,5 +66,13 @@ public class FileService {
     public List<FileEntity> getFilesByUser(Long userId) {
         // Получение списка файлов по пользователю
         return fileRepository.findAllByUser_Id(userId);
+    }
+
+    public List<FileEntity> getAllFiles() {
+        return fileRepository.findAll();
+    }
+
+    public void deleteFile(Long id) {
+        fileRepository.deleteById(id);
     }
 }

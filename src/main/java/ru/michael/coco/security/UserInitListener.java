@@ -23,11 +23,19 @@ public class UserInitListener implements ApplicationListener<ContextRefreshedEve
 
     @Override
     public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
-        if (userRepository.count() == 0) {
+        if (userRepository.findByUsername("user").isEmpty()) {
             UserEntity user = new UserEntity();
             user.setUsername("user");
             user.setPassword(passwordEncoder.encode("123"));
+            user.setRole(UserEntity.Role.USER);
             userRepository.save(user);
+        }
+        if (userRepository.findByUsername("admin").isEmpty()) {
+            UserEntity admin = new UserEntity();
+            admin.setUsername("admin");
+            admin.setPassword(passwordEncoder.encode("123"));
+            admin.setRole(UserEntity.Role.ADMIN);
+            userRepository.save(admin);
         }
     }
 }

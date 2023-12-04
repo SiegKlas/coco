@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin File Management</title>
+</head>
+<body>
+<h2>Admin File Management</h2>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>File Name</th>
+        <th>Upload Time</th>
+        <th>User</th>
+        <th>Action</th>
+    </tr>
+    <tr th:each="file : ${files}">
+        <td th:text="${file.id}"></td>
+        <td th:text="${file.fileName}"></td>
+        <td th:text="${file.uploadTime}"></td>
+        <td th:text="${file.user.username}"></td>
+        <td>
+            <a th:href="@{/admin/files/delete/{id}(id=${file.id})}">Delete</a>
+        </td>
+    </tr>
+</table>
+</body>
+</html>
