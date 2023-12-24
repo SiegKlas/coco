@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tasks</title>
+</head>
+<body>
+<h2>Tasks List</h2>
+<ul>
+    <li th:each="task : ${tasks}">
+        <div th:if="${task.status == 0}">
+            <!-- Задача кликабельна -->
+            <a th:href="@{/task/{id}(id=${task.id})}" th:text="${task.getTaskDescription().getName()}">Clickable
+                Task</a>
+        </div>
+        <div th:if="${task.status != 0}">
+            <!-- Задача не кликабельна -->
+            <span th:text="${task.getTaskDescription().getName()}">Non-clickable Task</span>
+        </div>
+    </li>
+</ul>
+</body>
+</html>

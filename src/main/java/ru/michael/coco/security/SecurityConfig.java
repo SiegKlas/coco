@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         (authz) -> authz
                                 .requestMatchers(mvc.pattern("/admin/**")).hasRole("ADMIN")
-                                .requestMatchers(mvc.pattern("/files"), mvc.pattern("/files/upload")).hasRole("USER")
+                                .requestMatchers(mvc.pattern("/files"), mvc.pattern("/files/upload")).hasRole("ADMIN")
                                 .requestMatchers(mvc.pattern("/h2-console/**")).permitAll()
                                 .requestMatchers(mvc.pattern("/"), mvc.pattern("/**")).permitAll()
                 ).formLogin(

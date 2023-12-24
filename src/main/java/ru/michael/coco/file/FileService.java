@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,6 +27,13 @@ public class FileService {
     public FileService(FileRepository fileRepository, UserRepository userRepository) {
         this.fileRepository = fileRepository;
         this.userRepository = userRepository;
+    }
+
+    public Long getUserIdFromPrincipal(Principal principal) {
+        String username = principal.getName();
+        UserEntity user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return user.getId();
     }
 
     // admin only
@@ -45,6 +53,7 @@ public class FileService {
             Files.createDirectories(uploadPath);
         }
         // Полный путь к файлу
+        assert fileName != null;
         Path filePath = uploadPath.resolve(fileName);
         Files.createDirectories(filePath.getParent());
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);

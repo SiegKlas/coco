@@ -1,21 +1,19 @@
 package ru.michael.coco.security;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import ru.michael.coco.user.UserEntity;
 import ru.michael.coco.user.UserRepository;
 
-@Component
+//@Component
 public class UserInitListener implements ApplicationListener<ContextRefreshedEvent> {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
+    //@Autowired
     public UserInitListener(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;

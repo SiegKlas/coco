@@ -17,3 +17,5 @@ spring:
       path: /h2-console
 file:
   upload-dir: D:\diploma\coco\uploads
+  xbank-dir: D:\diploma\robot\xbank
+  creds: D:\diploma\coco\users\creds.csv

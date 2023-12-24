@@ -1,15 +1,13 @@
 package ru.michael.coco.user;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.michael.coco.task.Task;
 
 import java.io.Serial;
 import java.util.Collection;
@@ -32,6 +30,9 @@ public class UserEntity implements UserDetails {
     private Long id;
     private String username;
     private String password;
+
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Task> tasks;
 
     public enum Role {
         USER, ADMIN
