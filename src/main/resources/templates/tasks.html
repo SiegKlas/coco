@@ -2,21 +2,86 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Tasks</title>
+    <style>
+        .list-container {
+            margin: 10px;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        .list-item {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .list-item:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
 </head>
 <body>
-<h2>Tasks List</h2>
-<ul>
-    <li th:each="task : ${tasks}">
-        <div th:if="${task.status == 0}">
-            <!-- Задача кликабельна -->
-            <a th:href="@{/task/{id}(id=${task.id})}" th:text="${task.getTaskDescription().getName()}">Clickable
-                Task</a>
-        </div>
-        <div th:if="${task.status != 0}">
-            <!-- Задача не кликабельна -->
-            <span th:text="${task.getTaskDescription().getName()}">Non-clickable Task</span>
-        </div>
-    </li>
-</ul>
+<div th:if="${not #lists.isEmpty(topics)}">
+    <h2>Topics</h2>
+    <ul class="list-container">
+        <li class="list-item"
+            th:each="t : ${topics}"
+            th:onclick="'redirectTo(\'' + ${t} + '\', null, null)'"
+            th:text="${t}"></li>
+    </ul>
+</div>
+<div th:if="${not #lists.isEmpty(levels)}">
+    <h2>Levels</h2>
+    <ul class="list-container">
+        <li class="list-item"
+            th:each="l : ${levels}"
+            th:onclick="'redirectTo(\'' + ${2} + '\', ' + ${l} + ', null)'"
+            th:text="${l}"></li>
+    </ul>
+</div>
+<div th:if="${not #lists.isEmpty(numbers)}">
+    <h2>Exercises</h2>
+    <ul class="list-container">
+        <li class="list-item"
+            th:each="n : ${numbers}"
+            th:onclick="'redirectTo(\'' + ${topic} + '\', ' + ${level} + ', ' + ${n} + ')'"
+            th:text="${n}"></li>
+    </ul>
+</div>
+<div th:if="${task_description != null}">
+    <h2 th:text="'Task ' + ${dir_name}">Task</h2>
+    <div th:if="${dir_name != null}">
+        <iframe
+                height="600px"
+                loading="lazy"
+                th:src="@{/pdf/{dir_name}(dir_name=${dir_name})}"
+                title="PDF-file"
+                width="60%"
+        ></iframe>
+    </div>
+    <a class="btn btn-primary" th:href="@{/asm/{filename}(filename=${dir_name})}">Download asm File</a>
+    <form action="/upload/solution" enctype="multipart/form-data" method="POST">
+        <input name="file" type="file"/>
+        <button type="submit">Upload</button>
+    </form>
+</div>
+
+<script>
+    function redirectTo(topic, level, number) {
+        let url = '/tasks?';
+        if (topic) {
+            url += 'topic=' + topic;
+            if (level) {
+                url += '&level=' + level;
+                if (number) {
+                    url += '&number=' + number;
+                }
+            }
+        }
+        window.location.href = url;
+    }
+</script>
 </body>
 </html>

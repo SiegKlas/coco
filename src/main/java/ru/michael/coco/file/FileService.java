@@ -44,21 +44,18 @@ public class FileService {
     }
 
     public void saveFile(MultipartFile file, Long userId) throws IOException {
-        // Генерируем уникальное имя файла
         String fileName = file.getOriginalFilename();
-        // Путь к директории, где будут храниться загруженные файлы
         Path uploadPath = Path.of(uploadDir);
-        // Создаем директорию, если её нет
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
-        // Полный путь к файлу
+
         assert fileName != null;
         Path filePath = uploadPath.resolve(fileName);
         Files.createDirectories(filePath.getParent());
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
-        // Создаем запись в базе данных
+
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -73,7 +70,6 @@ public class FileService {
     }
 
     public List<FileEntity> getFilesByUser(Long userId) {
-        // Получение списка файлов по пользователю
         return fileRepository.findAllByUser_Id(userId);
     }
 

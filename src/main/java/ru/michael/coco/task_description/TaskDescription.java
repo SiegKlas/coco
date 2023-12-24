@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class TaskDescription {
     private final String name;
-    private final String topic;
+    private final Integer topic;
     private final Integer level;
     private final Integer number;
     private final String contextPath;

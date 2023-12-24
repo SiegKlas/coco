@@ -79,7 +79,7 @@ public class DataLoaderConfig {
                     UserEntity user = new UserEntity();
                     user.setUsername(login);
                     user.setPassword(passwordEncoder.encode(password));
-                    user.setRole(UserEntity.Role.USER);
+                    user.setRole(UserEntity.Role.ADMIN);
                     userRepository.save(user);
                 }
             }
