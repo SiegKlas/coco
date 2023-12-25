@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.michael.coco.attempt.AttemptRepository;
 import ru.michael.coco.task.Task;
 import ru.michael.coco.task.TaskRepository;
 import ru.michael.coco.task_description.TaskDescription;
@@ -65,7 +64,7 @@ public class DataLoaderConfig {
         return args -> {
             userRepository.deleteAll();
 
-            String line = "";
+            String line;
             String csvSplitBy = ",";
             try (BufferedReader br = new BufferedReader(new FileReader(creds))) {
                 br.readLine();
@@ -87,20 +86,15 @@ public class DataLoaderConfig {
 
     @Bean
     @DependsOn({"tasksLoader", "userLoader"})
-    public CommandLineRunner tasksInit(AttemptRepository attemptRepository) {
+    public CommandLineRunner tasksInit() {
         return args -> {
             List<UserEntity> users = userRepository.findAll();
             List<TaskDescription> descriptions = taskDescriptionRepository.findAll();
 
-            users.forEach(u -> {
-                descriptions.forEach(d -> {
-                    Task task = new Task(u, d, new ArrayList<>());
-                    taskRepository.save(task);
-//                    var a = new Attempt(u, task, "123", "321");
-//                    attemptRepository.save(a);
-//                    task.getAttempt().add(a);
-                });
-            });
+            users.forEach(u -> descriptions.forEach(d -> {
+                Task task = new Task(u, d, new ArrayList<>());
+                taskRepository.save(task);
+            }));
         };
     }
 }

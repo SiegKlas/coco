@@ -14,6 +14,7 @@ import java.nio.file.StandardCopyOption;
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class FileService {
@@ -44,13 +45,12 @@ public class FileService {
     }
 
     public void saveFile(MultipartFile file, Long userId) throws IOException {
-        String fileName = file.getOriginalFilename();
+        String fileName = Objects.requireNonNull(file.getOriginalFilename()).replace("exfiles_copy/", "");
         Path uploadPath = Path.of(uploadDir);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
-        assert fileName != null;
         Path filePath = uploadPath.resolve(fileName);
         Files.createDirectories(filePath.getParent());
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);

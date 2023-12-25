@@ -14,16 +14,16 @@
         <th>User</th>
         <th>Action</th>
     </tr>
-    <tr th:each="file : ${files}">
-        <td th:text="${file.id}"></td>
+    <tr th:each="file : ${files}" th:if="${file.getUser().getUsername() == 'admin'}">
         <td th:text="${file.fileName}"></td>
-        <td th:text="${file.uploadTime}"></td>
         <td th:text="${file.user.username}"></td>
         <td>
             <a th:href="@{/admin/files/delete/{id}(id=${file.id})}">Delete</a>
         </td>
     </tr>
 </table>
-button
+<form method="post" th:action="@{/admin/files/bank}">
+    <button type="submit">Generate bank</button>
+</form>
 </body>
 </html>

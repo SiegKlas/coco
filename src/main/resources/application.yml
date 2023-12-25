@@ -16,7 +16,7 @@ spring:
       enabled: true
       path: /h2-console
 file:
-  upload-dir: D:\diploma\coco\uploads
+  upload-dir: D:\diploma\robot\exfiles
   xbank-dir: D:\diploma\robot\xbank
   creds: D:\diploma\coco\users\creds.csv
   solutions: D:\diploma\coco\solutions
