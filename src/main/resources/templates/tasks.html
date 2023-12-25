@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Tasks</title>
     <style>
@@ -37,7 +37,7 @@
     <ul class="list-container">
         <li class="list-item"
             th:each="l : ${levels}"
-            th:onclick="'redirectTo(\'' + ${2} + '\', ' + ${l} + ', null)'"
+            th:onclick="'redirectTo(\'' + ${topic} + '\', ' + ${l} + ', null)'"
             th:text="${l}"></li>
     </ul>
 </div>
@@ -62,10 +62,13 @@
         ></iframe>
     </div>
     <a class="btn btn-primary" th:href="@{/asm/{filename}(filename=${dir_name})}">Download asm File</a>
+    <h3>Upload Solution</h3>
     <form action="/upload/solution" enctype="multipart/form-data" method="POST">
+        <input name="dir_name" th:value="${dir_name}" type="hidden"/>
         <input name="file" type="file"/>
         <button type="submit">Upload</button>
     </form>
+    <h3>Previous Solutions</h3>
 </div>
 
 <script>

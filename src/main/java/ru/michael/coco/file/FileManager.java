@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 public class FileManager {
-    public static void moveMultipartFileToSubfolder(Path path, String subfolderName, MultipartFile multipartFile) throws IOException {
+    public static String moveMultipartFileToSubfolder(Path path, String subfolderName, MultipartFile multipartFile) throws IOException {
         Path subfolderPath = path.resolve(subfolderName);
 
         if (!Files.exists(subfolderPath)) {
@@ -37,5 +37,6 @@ public class FileManager {
         }
 
         Files.move(tempFile, newFilePath, StandardCopyOption.REPLACE_EXISTING);
+        return newFilePath.toString();
     }
 }

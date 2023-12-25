@@ -59,12 +59,8 @@ public class FileService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        FileEntity fileEntity = new FileEntity();
-        fileEntity.setFileName(fileName);
-        fileEntity.setFilePath(filePath.toString());
-        fileEntity.setFileType(file.getContentType());
-        fileEntity.setUser(user);
-        fileEntity.setUploadTime(LocalDateTime.now());
+        FileEntity fileEntity = new FileEntity(fileName, file.getContentType(), filePath.toString(), user,
+                LocalDateTime.now());
 
         fileRepository.save(fileEntity);
     }
