@@ -64,11 +64,17 @@
     <a class="btn btn-primary" th:href="@{/asm/{filename}(filename=${dir_name})}">Download asm File</a>
     <h3>Upload Solution</h3>
     <form action="/upload/solution" enctype="multipart/form-data" method="POST">
+        <input name="topic" th:value="${topic}" type="hidden"/>
+        <input name="level" th:value="${level}" type="hidden"/>
+        <input name="number" th:value="${number}" type="hidden"/>
         <input name="dir_name" th:value="${dir_name}" type="hidden"/>
         <input name="file" type="file"/>
         <button type="submit">Upload</button>
     </form>
     <h3>Previous Solutions</h3>
+    <div>
+
+    </div>
 </div>
 
 <script>

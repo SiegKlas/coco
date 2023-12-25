@@ -18,7 +18,8 @@ public class Attempt {
     @ManyToOne
     private final Task task;
     private final String solutionPath;
-    private final String responsePath;
+    @OneToOne
+    private final Response response;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

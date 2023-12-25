@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.task_description.TaskDescriptionService;
+import ru.michael.coco.user.UserEntity;
+import ru.michael.coco.user.UserRepository;
 
 import java.util.Optional;
 
@@ -17,10 +19,15 @@ import java.util.Optional;
 public class TaskController {
     private final TaskDescriptionService taskDescriptionService;
     private final TaskService taskService;
+    private final TaskRepository taskRepository;
+    private final UserRepository userRepository;
 
-    public TaskController(TaskDescriptionService taskDescriptionService, TaskService taskService) {
+    public TaskController(TaskDescriptionService taskDescriptionService, TaskService taskService,
+                          TaskRepository taskRepository, UserRepository userRepository) {
         this.taskDescriptionService = taskDescriptionService;
         this.taskService = taskService;
+        this.taskRepository = taskRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping
@@ -48,8 +55,11 @@ public class TaskController {
             model.addAttribute("number", number.orElseThrow());
             TaskDescription taskDescription = taskDescriptionService.getTaskDescription(topic.orElseThrow(),
                     level.orElseThrow(), number.orElseThrow()).orElseThrow();
-            model.addAttribute("task_description", taskDescription);
+            model.addAttribute("task_description", taskDescription); // not necessary
             model.addAttribute("dir_name", taskDescription.getName());
+            UserEntity user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
+            Task task = taskRepository.findTaskByUserAndTaskDescription(user, taskDescription);
+            model.addAttribute("attempts", task.getAttempt());
         }
         return "tasks";
     }

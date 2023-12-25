@@ -17,4 +17,6 @@ public interface TaskDescriptionRepository extends JpaRepository<TaskDescription
     @Query("SELECT td FROM TaskDescription td WHERE td.topic = :topic AND td.level = :level AND td.number = :number")
     Optional<TaskDescription> getTaskDescription(@Param("topic") Integer topic, @Param("level") Integer level,
                                                  @Param("number") Integer number);
+
+    TaskDescription findTaskDescriptionByTopicAndLevelAndNumber(Integer topic, Integer level, Integer number);
 }

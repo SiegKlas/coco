@@ -9,7 +9,7 @@ import ru.michael.coco.attempt.Attempt;
 import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.user.UserEntity;
 
-import java.util.Set;
+import java.util.List;
 
 @Data
 @Entity
@@ -21,7 +21,7 @@ public class Task {
     @ManyToOne
     private final TaskDescription taskDescription;
     @OneToMany
-    private final Set<Attempt> attempt;
+    private final List<Attempt> attempt;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

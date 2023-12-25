@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.michael.coco.attempt.Attempt;
 import ru.michael.coco.attempt.AttemptRepository;
 import ru.michael.coco.task.Task;
 import ru.michael.coco.task.TaskRepository;
@@ -97,9 +96,9 @@ public class DataLoaderConfig {
                 descriptions.forEach(d -> {
                     Task task = new Task(u, d, new HashSet<>());
                     taskRepository.save(task);
-                    var a = new Attempt(u, task, "123", "321");
-                    attemptRepository.save(a);
-                    task.getAttempt().add(a);
+//                    var a = new Attempt(u, task, "123", "321");
+//                    attemptRepository.save(a);
+//                    task.getAttempt().add(a);
                 });
             });
         };
