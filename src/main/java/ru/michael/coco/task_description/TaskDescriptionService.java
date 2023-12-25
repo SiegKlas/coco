@@ -51,4 +51,8 @@ public class TaskDescriptionService {
     public Optional<TaskDescription> getTaskDescription(Integer topic, Integer level, Integer number) {
         return taskDescriptionRepository.getTaskDescription(topic, level, number);
     }
+
+    public List<TaskDescription> getTaskDescriptions(Integer topic, Integer level) {
+        return taskDescriptionRepository.findTaskDescriptionsByTopicAndLevel(topic, level);
+    }
 }

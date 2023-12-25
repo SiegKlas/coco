@@ -93,6 +93,7 @@ public class UploadController {
             } else if (!task.getStatus().equals(2)) {
                 task.setStatus(1);
             }
+            taskRepository.save(task);
 
             System.out.println(responseEntity.getBody());
         } catch (IOException e) {

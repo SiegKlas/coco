@@ -39,10 +39,12 @@ public class SecurityConfig {
                                 .requestMatchers(mvc.pattern("/admin/**")).hasRole("ADMIN")
                                 .requestMatchers(mvc.pattern("/files"), mvc.pattern("/files/upload")).hasRole("ADMIN")
                                 .requestMatchers(mvc.pattern("/h2-console/**")).permitAll()
-                                .requestMatchers(mvc.pattern("/"), mvc.pattern("/**")).permitAll()
+                                .requestMatchers(mvc.pattern("/login")).permitAll()
+                                .requestMatchers(mvc.pattern("/"), mvc.pattern("/**")).authenticated()
                 ).formLogin(
                         formLogin -> formLogin
                                 .loginPage("/login")
+                                .defaultSuccessUrl("/tasks")
                 ).logout(
                         logout -> logout
                                 .logoutUrl("/logout")

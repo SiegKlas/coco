@@ -20,6 +20,75 @@
         .list-item:hover {
             background-color: #f5f5f5;
         }
+
+        .status-green {
+            background-color: #d4edda;
+        }
+
+        .status-red {
+            background-color: #f8d7da;
+        }
+
+        .status-light-green {
+            background-color: #e9f7ef; /* Очень светлый зеленый */
+        }
+
+        .status-light-red {
+            background-color: #fce8e6; /* Очень светлый красный */
+        }
+
+        .button-back {
+            display: inline-block;
+            margin: 10px 0;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .button-back:hover {
+            background-color: #0056b3;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+        }
+
+        body {
+            margin: 0;
+            padding-top: 10px;
+            padding-left: 25px;
+            padding-right: 25px;
+            box-sizing: border-box;
+        }
+
+        .table {
+            border-collapse: collapse;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
+        }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f4f4f4;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .table tr:hover {
+            background-color: #f1f1f1;
+        }
     </style>
 </head>
 <body>
@@ -40,18 +109,25 @@
             th:onclick="'redirectTo(\'' + ${topic} + '\', ' + ${l} + ', null)'"
             th:text="${l}"></li>
     </ul>
+    <button class="button-back" onclick="location.href='/tasks'">Topics</button>
 </div>
 <div th:if="${not #lists.isEmpty(numbers)}">
     <h2>Exercises</h2>
     <ul class="list-container">
         <li class="list-item"
-            th:each="n : ${numbers}"
+            th:classappend="${tasks[iterStat.index].status == 2 ? 'status-green' :
+                            (tasks[iterStat.index].status == 1 ? 'status-red' : '')}"
+            th:each="n, iterStat : ${numbers}"
             th:onclick="'redirectTo(\'' + ${topic} + '\', ' + ${level} + ', ' + ${n} + ')'"
-            th:text="${n}"></li>
+            th:text="${n}">
+        </li>
     </ul>
+    <button class="button-back" th:onclick="'redirectTo(\'' + ${topic} + '\', null, null)'">Levels</button>
 </div>
 <div th:if="${task_description != null}">
     <h2 th:text="'Task ' + ${dir_name}">Task</h2>
+    <button class="button-back" th:onclick="'redirectTo(\'' + ${topic} + '\', ' + ${level} + ', null)'">Exercises
+    </button>
     <div th:if="${dir_name != null}">
         <iframe
                 height="600px"
@@ -71,9 +147,29 @@
         <input name="file" type="file"/>
         <button type="submit">Upload</button>
     </form>
-    <h3>Previous Solutions</h3>
-    <div>
-
+    <div th:if="${attempts.size() > 0}">
+        <h2>Previous Solutions</h2>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Status</th>
+                <th>Task</th>
+                <th>Solution</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:classappend="${attempt.response.status == 'success' ? 'status-light-green' :
+                                (attempt.response.status == 'error' ? 'status-light-red' : '')}"
+                th:each="attempt, iterStat : ${attempts}">
+                <td th:text="${attempt.response.status}">Status</td>
+                <td th:text="${attempt.response.output}">Output</td>
+                <td>
+                    <a class="btn btn-primary"
+                       th:href="@{/solution/{filename}(filename=${file_names[iterStat.index]})}">Download</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 

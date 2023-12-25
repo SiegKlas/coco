@@ -19,4 +19,6 @@ public interface TaskDescriptionRepository extends JpaRepository<TaskDescription
                                                  @Param("number") Integer number);
 
     TaskDescription findTaskDescriptionByTopicAndLevelAndNumber(Integer topic, Integer level, Integer number);
+
+    List<TaskDescription> findTaskDescriptionsByTopicAndLevel(Integer topic, Integer level);
 }

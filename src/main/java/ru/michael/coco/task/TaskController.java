@@ -7,11 +7,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import ru.michael.coco.attempt.Attempt;
 import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.task_description.TaskDescriptionService;
 import ru.michael.coco.user.UserEntity;
 import ru.michael.coco.user.UserRepository;
 
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -48,6 +52,14 @@ public class TaskController {
             model.addAttribute("level", level.orElseThrow());
             model.addAttribute("numbers", taskDescriptionService.getNumbersForTopicAndLevel(topic.orElseThrow(),
                     level.orElseThrow()));
+            List<TaskDescription> taskDescriptions = taskDescriptionService.getTaskDescriptions(topic.orElseThrow(),
+                    level.orElseThrow());
+            UserEntity user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
+            List<Task> tasks = new ArrayList<>();
+            for (TaskDescription taskDescription : taskDescriptions) {
+                tasks.add(taskRepository.findTaskByUserAndTaskDescription(user, taskDescription));
+            }
+            model.addAttribute("tasks", tasks);
         }
         if (topic.isPresent() && level.isPresent() && number.isPresent()) {
             model.addAttribute("topic", topic.orElseThrow());
@@ -59,7 +71,13 @@ public class TaskController {
             model.addAttribute("dir_name", taskDescription.getName());
             UserEntity user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
             Task task = taskRepository.findTaskByUserAndTaskDescription(user, taskDescription);
-            model.addAttribute("attempts", task.getAttempt());
+            List<Attempt> attempts = task.getAttempt();
+            List<String> fileNames = attempts.stream()
+                    .map(attempt -> Paths.get(attempt.getSolutionPath()).getFileName().toString())
+                    .toList();
+            model.addAttribute("attempts", attempts);
+            model.addAttribute("file_names", fileNames);
+            model.addAttribute("status", task.getStatus());
         }
         return "tasks";
     }

@@ -20,7 +20,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -94,7 +94,7 @@ public class DataLoaderConfig {
 
             users.forEach(u -> {
                 descriptions.forEach(d -> {
-                    Task task = new Task(u, d, new HashSet<>());
+                    Task task = new Task(u, d, new ArrayList<>());
                     taskRepository.save(task);
 //                    var a = new Attempt(u, task, "123", "321");
 //                    attemptRepository.save(a);
