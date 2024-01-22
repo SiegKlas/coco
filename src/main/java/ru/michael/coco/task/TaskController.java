@@ -42,6 +42,7 @@ public class TaskController {
                            @AuthenticationPrincipal UserDetails userDetails) {
         if (topic.isEmpty() && level.isEmpty() && number.isEmpty()) {
             model.addAttribute("topics", taskDescriptionService.getAllTopics());
+            model.addAttribute("topicsNames", taskDescriptionService.getAllTopicsNames());
         }
         if (topic.isPresent() && level.isEmpty() && number.isEmpty()) {
             model.addAttribute("topic", topic.orElseThrow());

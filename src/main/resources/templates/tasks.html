@@ -96,9 +96,9 @@
     <h2>Topics</h2>
     <ul class="list-container">
         <li class="list-item"
-            th:each="t : ${topics}"
+            th:each="t,iterStat : ${topics}"
             th:onclick="'redirectTo(\'' + ${t} + '\', null, null)'"
-            th:text="${t}"></li>
+            th:text="${topicsNames[iterStat.index]}"></li>
     </ul>
 </div>
 <div th:if="${not #lists.isEmpty(levels)}">
@@ -119,7 +119,7 @@
                             (tasks[iterStat.index].status == 1 ? 'status-red' : '')}"
             th:each="n, iterStat : ${numbers}"
             th:onclick="'redirectTo(\'' + ${topic} + '\', ' + ${level} + ', ' + ${n} + ')'"
-            th:text="${n}">
+            th:text="${tasks[iterStat.index].getTaskDescription().getTaskName()}">
         </li>
     </ul>
     <button class="button-back" th:onclick="'redirectTo(\'' + ${topic} + '\', null, null)'">Levels</button>
@@ -162,7 +162,10 @@
                                 (attempt.response.status == 'error' ? 'status-light-red' : '')}"
                 th:each="attempt, iterStat : ${attempts}">
                 <td th:text="${attempt.response.status}">Status</td>
-                <td th:text="${attempt.response.output}">Output</td>
+                <td th:style="'white-space: pre-line;'"
+                    th:utext="${#strings.replace(attempt.response.output, '\n', '<br/>')}">Output
+                </td>
+
                 <td>
                     <a class="btn btn-primary"
                        th:href="@{/solution/{filename}(filename=${file_names[iterStat.index]})}">Download</a>

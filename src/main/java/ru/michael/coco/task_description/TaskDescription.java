@@ -16,8 +16,10 @@ import lombok.RequiredArgsConstructor;
 public class TaskDescription {
     private final String name;
     private final Integer topic;
+    private final String topicName;
     private final Integer level;
     private final Integer number;
+    private final String taskName;
     private final String contextPath;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

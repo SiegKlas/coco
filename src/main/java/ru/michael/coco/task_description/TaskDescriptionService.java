@@ -1,9 +1,15 @@
 package ru.michael.coco.task_description;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -29,15 +35,39 @@ public class TaskDescriptionService {
             String level = matcher.group(2);
             String number = matcher.group(3);
 
-            taskDescriptionRepository.save(new TaskDescription(fName, Integer.parseInt(topic), Integer.parseInt(level)
-                    , Integer.parseInt(number), path.toString()));
+            ObjectMapper objectMapper = new ObjectMapper();
+            Path metaPath = path.resolve("meta.json");
+            try {
+                MetaData metaData = objectMapper.readValue(Files.newBufferedReader(metaPath), MetaData.class);
+                String topicName = metaData.getTopic();
+                String taskName = metaData.getTask();
+
+                taskDescriptionRepository.save(new TaskDescription(fName, Integer.parseInt(topic), topicName,
+                        Integer.parseInt(level), Integer.parseInt(number), taskName, path.toString())
+                );
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         } else {
             throw new RuntimeException("Task description not found");
         }
     }
 
+    public List<String> getAllTopicsNames() {
+        return taskDescriptionRepository.findAll().stream().sorted(Comparator.comparing(TaskDescription::getTopic)).map(TaskDescription::getTopicName).distinct().toList();
+    }
+
     public List<Integer> getAllTopics() {
         return taskDescriptionRepository.findAll().stream().map(TaskDescription::getTopic).distinct().sorted().toList();
+    }
+
+    @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private static class MetaData {
+        @JsonProperty("topic")
+        private String topic;
+        @JsonProperty("task")
+        private String task;
     }
 
     public List<Integer> getLevelsForTopic(Integer topic) {
