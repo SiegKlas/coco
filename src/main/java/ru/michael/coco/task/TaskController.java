@@ -46,7 +46,12 @@ public class TaskController {
         }
         if (topic.isPresent() && level.isEmpty() && number.isEmpty()) {
             model.addAttribute("topic", topic.orElseThrow());
-            model.addAttribute("levels", taskDescriptionService.getLevelsForTopic(topic.orElseThrow()));
+            List<Integer> levels = taskDescriptionService.getLevelsForTopic(topic.orElseThrow());
+            model.addAttribute("levels", levels);
+            List<Boolean> areLevelsLocked = levels.stream()
+                    .map(l -> taskService.isLevelLocked(userDetails, topic.orElseThrow(), l))
+                    .toList();
+            model.addAttribute("areLevelsLocked", areLevelsLocked);
         }
         if (topic.isPresent() && level.isPresent() && number.isEmpty()) {
             model.addAttribute("topic", topic.orElseThrow());

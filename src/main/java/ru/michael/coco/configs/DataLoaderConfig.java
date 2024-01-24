@@ -9,6 +9,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.michael.coco.task.Task;
 import ru.michael.coco.task.TaskRepository;
+import ru.michael.coco.task.TaskService;
 import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.task_description.TaskDescriptionRepository;
 import ru.michael.coco.task_description.TaskDescriptionService;
@@ -35,16 +36,18 @@ public class DataLoaderConfig {
     private String xbankDir;
     @Value("${file.creds}")
     private String creds;
+    private final TaskService taskService;
 
     @Autowired
     public DataLoaderConfig(TaskDescriptionService taskDescriptionService, UserRepository userRepository,
                             PasswordEncoder passwordEncoder, TaskRepository taskRepository,
-                            TaskDescriptionRepository taskDescriptionRepository) {
+                            TaskDescriptionRepository taskDescriptionRepository, TaskService taskService) {
         this.taskDescriptionService = taskDescriptionService;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.taskRepository = taskRepository;
         this.taskDescriptionRepository = taskDescriptionRepository;
+        this.taskService = taskService;
     }
 
     @Bean
@@ -93,7 +96,10 @@ public class DataLoaderConfig {
 
             users.forEach(u -> descriptions.forEach(d -> {
                 Task task = new Task(u, d, new ArrayList<>());
-                taskRepository.save(task);
+                if (task.getTaskDescription().getLevel().equals(1)) {
+                    task.setIsLocked(false);
+                }
+                taskService.save(task);
             }));
         };
     }

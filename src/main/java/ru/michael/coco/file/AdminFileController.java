@@ -10,6 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import ru.michael.coco.task.Task;
 import ru.michael.coco.task.TaskRepository;
+import ru.michael.coco.task.TaskService;
 import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.task_description.TaskDescriptionRepository;
 import ru.michael.coco.task_description.TaskDescriptionService;
@@ -35,16 +36,18 @@ public class AdminFileController {
     private final TaskDescriptionRepository taskDescriptionRepository;
     @Value("${file.xbank-dir}")
     private String xbankDir;
+    private final TaskService taskService;
 
     @Autowired
     public AdminFileController(FileService fileService, TaskDescriptionService taskDescriptionService,
                                UserRepository userRepository, TaskRepository taskRepository,
-                               TaskDescriptionRepository taskDescriptionRepository) {
+                               TaskDescriptionRepository taskDescriptionRepository, TaskService taskService) {
         this.fileService = fileService;
         this.taskDescriptionService = taskDescriptionService;
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
         this.taskDescriptionRepository = taskDescriptionRepository;
+        this.taskService = taskService;
     }
 
     @GetMapping("/upload")
@@ -94,7 +97,7 @@ public class AdminFileController {
 
         users.forEach(u -> descriptions.forEach(d -> {
             Task task = new Task(u, d, new ArrayList<>());
-            taskRepository.save(task);
+            taskService.save(task);
         }));
 
         return "redirect:/admin/files";
