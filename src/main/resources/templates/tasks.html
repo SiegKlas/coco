@@ -89,6 +89,25 @@
         .table tr:hover {
             background-color: #f1f1f1;
         }
+
+        .status-light-gray {
+            background-color: #e0e0e0;
+        }
+
+        .list-item-1 {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .list-item-1:hover {
+            background-color: #e0e0e0; /* Очень светлый серый */
+            cursor: default; /* Используйте "default" для стандартной стрелочки курсора */
+        }
+
+
     </style>
 </head>
 <body>
@@ -104,13 +123,15 @@
 <div th:if="${not #lists.isEmpty(levels)}">
     <h2>Levels</h2>
     <ul class="list-container">
-        <li class="list-item"
-            th:each="l : ${levels}"
-            th:onclick="'redirectTo(\'' + ${topic} + '\', ' + ${l} + ', null)'"
+        <li class="list-item list-item-1"
+            th:classappend="${areLevelsLocked[iterStat.index]} ? 'status-light-gray' : ''"
+            th:each="l, iterStat : ${levels}"
+            th:onclick="${areLevelsLocked[iterStat.index]} ? null : 'redirectTo(\'' + ${topic} + '\', ' + ${l} + ', null)'"
             th:text="${l}"></li>
     </ul>
     <button class="button-back" onclick="location.href='/tasks'">Topics</button>
 </div>
+
 <div th:if="${not #lists.isEmpty(numbers)}">
     <h2>Exercises</h2>
     <ul class="list-container">

@@ -15,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.michael.coco.attempt.*;
 import ru.michael.coco.task.Task;
 import ru.michael.coco.task.TaskRepository;
+import ru.michael.coco.task.TaskService;
 import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.task_description.TaskDescriptionRepository;
 import ru.michael.coco.user.UserEntity;
@@ -37,17 +38,19 @@ public class UploadController {
     private final AttemptRepository attemptRepository;
     @Value("${file.solutions}")
     private String solutionsDir;
+    private final TaskService taskService;
 
     @Autowired
     public UploadController(UserRepository userRepository, FileRepository fileRepository,
                             ResponseRepository responseRepository, TaskRepository taskRepository,
-                            TaskDescriptionRepository taskDescriptionRepository, AttemptRepository attemptRepository) {
+                            TaskDescriptionRepository taskDescriptionRepository, AttemptRepository attemptRepository, TaskService taskService) {
         this.userRepository = userRepository;
         this.fileRepository = fileRepository;
         this.responseRepository = responseRepository;
         this.taskRepository = taskRepository;
         this.taskDescriptionRepository = taskDescriptionRepository;
         this.attemptRepository = attemptRepository;
+        this.taskService = taskService;
     }
 
     @PostMapping("/solution")
@@ -94,7 +97,7 @@ public class UploadController {
                 task.setStatus(1);
             }
 
-            taskRepository.save(task);
+            taskService.save(task);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

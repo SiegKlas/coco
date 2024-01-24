@@ -1,13 +1,11 @@
-package ru.michael.coco.task;
+package ru.michael.coco.layers;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import ru.michael.coco.attempt.Attempt;
-import ru.michael.coco.task_description.TaskDescription;
-import ru.michael.coco.user.UserEntity;
+import ru.michael.coco.task.Task;
 
 import java.util.List;
 
@@ -15,16 +13,11 @@ import java.util.List;
 @Entity
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
-public class Task {
-    @ManyToOne
-    private final UserEntity user;
-    @ManyToOne
-    private final TaskDescription taskDescription;
+public class Level {
     @OneToMany
-    private final List<Attempt> attempt;
+    private final List<Task> tasks;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer status = 0;
     private Boolean isLocked = true;
 }
