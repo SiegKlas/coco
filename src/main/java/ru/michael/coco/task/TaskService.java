@@ -67,7 +67,10 @@ public class TaskService {
         // логика разблокировки заданий
         taskRepository.save(task);
         if (task.getStatus().equals(2)) {
-            findNextTask(task).ifPresent(n -> n.setIsLocked(false));
+            findNextTask(task).ifPresent(nextTask -> {
+                nextTask.setIsLocked(false);
+                taskRepository.save(nextTask);
+            });
         }
     }
 }
