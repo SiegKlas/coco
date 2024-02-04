@@ -14,12 +14,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class TaskDescription {
-    private final String name;
-    private final Integer topic;
-    private final String topicName;
-    private final Integer level;
+    private final String fileName;
     private final Integer number;
-    private final String taskName;
+    private final String name;
     private final String contextPath;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

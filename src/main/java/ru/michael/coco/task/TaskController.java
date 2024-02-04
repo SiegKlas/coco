@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import ru.michael.coco.attempt.Attempt;
 import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.task_description.TaskDescriptionService;
-import ru.michael.coco.user.UserEntity;
+import ru.michael.coco.user.User;
 import ru.michael.coco.user.UserRepository;
 
 import java.nio.file.Paths;
@@ -60,7 +60,7 @@ public class TaskController {
                     level.orElseThrow()));
             List<TaskDescription> taskDescriptions = taskDescriptionService.getTaskDescriptions(topic.orElseThrow(),
                     level.orElseThrow());
-            UserEntity user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
+            User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
             List<Task> tasks = new ArrayList<>();
             for (TaskDescription taskDescription : taskDescriptions) {
                 tasks.add(taskRepository.findTaskByUserAndTaskDescription(user, taskDescription));
@@ -74,8 +74,8 @@ public class TaskController {
             TaskDescription taskDescription = taskDescriptionService.getTaskDescription(topic.orElseThrow(),
                     level.orElseThrow(), number.orElseThrow()).orElseThrow();
             model.addAttribute("task_description", taskDescription); // not necessary
-            model.addAttribute("dir_name", taskDescription.getName());
-            UserEntity user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
+            model.addAttribute("dir_name", taskDescription.getFileName());
+            User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
             Task task = taskRepository.findTaskByUserAndTaskDescription(user, taskDescription);
             List<Attempt> attempts = task.getAttempt();
             List<String> fileNames = attempts.stream()

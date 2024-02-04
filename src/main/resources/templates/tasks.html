@@ -140,7 +140,7 @@
                             (tasks[iterStat.index].status == 1 ? 'status-red' : '')}"
             th:each="n, iterStat : ${numbers}"
             th:onclick="'redirectTo(\'' + ${topic} + '\', ' + ${level} + ', ' + ${n} + ')'"
-            th:text="${tasks[iterStat.index].getTaskDescription().getTaskName()}">
+            th:text="${tasks[iterStat.index].getTaskDescription().getName()}">
         </li>
     </ul>
     <button class="button-back" th:onclick="'redirectTo(\'' + ${topic} + '\', null, null)'">Levels</button>

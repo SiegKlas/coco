@@ -13,7 +13,7 @@ import ru.michael.coco.task.TaskService;
 import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.task_description.TaskDescriptionRepository;
 import ru.michael.coco.task_description.TaskDescriptionService;
-import ru.michael.coco.user.UserEntity;
+import ru.michael.coco.user.User;
 import ru.michael.coco.user.UserRepository;
 
 import java.io.BufferedReader;
@@ -77,10 +77,10 @@ public class DataLoaderConfig {
                     String login = userData[0];
                     String password = userData[1];
 
-                    UserEntity user = new UserEntity();
+                    User user = new User();
                     user.setUsername(login);
                     user.setPassword(passwordEncoder.encode(password));
-                    user.setRole(UserEntity.Role.ADMIN);
+                    user.setRole(User.Role.ADMIN);
                     userRepository.save(user);
                 }
             }
@@ -91,7 +91,7 @@ public class DataLoaderConfig {
     @DependsOn({"tasksLoader", "userLoader"})
     public CommandLineRunner tasksInit() {
         return args -> {
-            List<UserEntity> users = userRepository.findAll();
+            List<User> users = userRepository.findAll();
             List<TaskDescription> descriptions = taskDescriptionRepository.findAll();
 
             users.forEach(u -> descriptions.forEach(d -> {

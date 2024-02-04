@@ -14,7 +14,7 @@ import ru.michael.coco.task.TaskService;
 import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.task_description.TaskDescriptionRepository;
 import ru.michael.coco.task_description.TaskDescriptionService;
-import ru.michael.coco.user.UserEntity;
+import ru.michael.coco.user.User;
 import ru.michael.coco.user.UserRepository;
 
 import java.io.IOException;
@@ -92,7 +92,7 @@ public class AdminFileController {
                     .forEach(taskDescriptionService::saveTask);
         }
 
-        List<UserEntity> users = userRepository.findAll();
+        List<User> users = userRepository.findAll();
         List<TaskDescription> descriptions = taskDescriptionRepository.findAll();
 
         users.forEach(u -> descriptions.forEach(d -> {

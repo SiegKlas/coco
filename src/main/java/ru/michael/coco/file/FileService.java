@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import ru.michael.coco.user.UserEntity;
+import ru.michael.coco.user.User;
 import ru.michael.coco.user.UserRepository;
 
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class FileService {
 
     public Long getUserIdFromPrincipal(Principal principal) {
         String username = principal.getName();
-        UserEntity user = userRepository.findByUsername(username)
+        User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return user.getId();
     }
@@ -56,7 +56,7 @@ public class FileService {
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
 
-        UserEntity user = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         FileEntity fileEntity = new FileEntity(fileName, file.getContentType(), filePath.toString(), user,

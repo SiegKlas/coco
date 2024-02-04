@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -22,6 +21,10 @@ public class TaskDescriptionService {
     @Autowired
     public TaskDescriptionService(TaskDescriptionRepository taskDescriptionRepository) {
         this.taskDescriptionRepository = taskDescriptionRepository;
+    }
+
+    public Optional<TaskDescription> findTaskDescriptionByNumber(Integer number) {
+        return taskDescriptionRepository.findTaskDescriptionByNumber(number);
     }
 
     public void saveTask(Path path) {
@@ -53,14 +56,6 @@ public class TaskDescriptionService {
         }
     }
 
-    public List<String> getAllTopicsNames() {
-        return taskDescriptionRepository.findAll().stream().sorted(Comparator.comparing(TaskDescription::getTopic)).map(TaskDescription::getTopicName).distinct().toList();
-    }
-
-    public List<Integer> getAllTopics() {
-        return taskDescriptionRepository.findAll().stream().map(TaskDescription::getTopic).distinct().sorted().toList();
-    }
-
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private static class MetaData {
@@ -68,21 +63,5 @@ public class TaskDescriptionService {
         private String topic;
         @JsonProperty("task")
         private String task;
-    }
-
-    public List<Integer> getLevelsForTopic(Integer topic) {
-        return taskDescriptionRepository.getLevelsForTopic(topic).stream().sorted().toList();
-    }
-
-    public List<Integer> getNumbersForTopicAndLevel(Integer topic, Integer level) {
-        return taskDescriptionRepository.getNumbersForTopicAndLevel(topic, level).stream().sorted().toList();
-    }
-
-    public Optional<TaskDescription> getTaskDescription(Integer topic, Integer level, Integer number) {
-        return taskDescriptionRepository.getTaskDescription(topic, level, number);
-    }
-
-    public List<TaskDescription> getTaskDescriptions(Integer topic, Integer level) {
-        return taskDescriptionRepository.findTaskDescriptionsByTopicAndLevel(topic, level);
     }
 }

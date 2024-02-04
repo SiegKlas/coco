@@ -4,35 +4,35 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import ru.michael.coco.task.Task;
+import ru.michael.coco.topic.Topic;
 
-import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 
 @Data
 @Entity
+@RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC, force = true)
-public class UserEntity implements UserDetails {
+@Table(name = "_user")
+public class User implements UserDetails {
     private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
     }
-    @Serial
-    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private String username;
+    private final String username;
     private String password;
 
     @OneToMany(cascade = CascadeType.ALL)
-    private List<Task> tasks;
+    private List<Topic> topics;
 
     public enum Role {
         USER, ADMIN

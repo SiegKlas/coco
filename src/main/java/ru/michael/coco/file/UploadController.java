@@ -22,7 +22,7 @@ import ru.michael.coco.task.TaskRepository;
 import ru.michael.coco.task.TaskService;
 import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.task_description.TaskDescriptionRepository;
-import ru.michael.coco.user.UserEntity;
+import ru.michael.coco.user.User;
 import ru.michael.coco.user.UserRepository;
 
 import java.io.IOException;
@@ -71,7 +71,7 @@ public class UploadController {
 
             String otherServerUrl = "http://127.0.0.1:5000/api/check";
             RestTemplate restTemplate = new RestTemplate();
-            UserEntity user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
+            User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
             FileEntity fileEntity = new FileEntity(
                     file.getOriginalFilename(),
                     file.getContentType(),

@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.michael.coco.level.Level;
+import ru.michael.coco.topic_description.TopicDescription;
 
 import java.util.List;
 
@@ -16,6 +17,8 @@ import java.util.List;
 public class Topic {
     @OneToMany
     private final List<Level> levels;
+    @ManyToOne
+    private final TopicDescription topicDescription;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

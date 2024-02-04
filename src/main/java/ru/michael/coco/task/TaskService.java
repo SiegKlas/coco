@@ -3,7 +3,7 @@ package ru.michael.coco.task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-import ru.michael.coco.user.UserEntity;
+import ru.michael.coco.user.User;
 import ru.michael.coco.user.UserRepository;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class TaskService {
     }
 
     public List<Task> findTasksByUser(UserDetails userDetails) {
-        UserEntity user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
+        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
         return taskRepository.findTasksByUser(user);
     }
 
