@@ -1,5 +1,6 @@
 package ru.michael.coco.file;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import ru.michael.coco.attempt.*;
+import ru.michael.coco.attempt.Attempt;
+import ru.michael.coco.attempt.AttemptRepository;
+import ru.michael.coco.attempt.Response;
+import ru.michael.coco.attempt.ResponseRepository;
 import ru.michael.coco.task.Task;
 import ru.michael.coco.task.TaskRepository;
 import ru.michael.coco.task.TaskService;
@@ -39,6 +43,7 @@ public class UploadController {
     @Value("${file.solutions}")
     private String solutionsDir;
     private final TaskService taskService;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     public UploadController(UserRepository userRepository, FileRepository fileRepository,
@@ -80,7 +85,7 @@ public class UploadController {
             json.put("filePath", fullPath);
             json.put("dirName", dirName);
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(otherServerUrl, json, String.class);
-            Response response = JsonParser.parseJson(responseEntity.getBody());
+            Response response = objectMapper.readValue(responseEntity.getBody(), Response.class);
             responseRepository.save(response);
 
             TaskDescription taskDescription =

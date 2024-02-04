@@ -1,10 +1,11 @@
-package ru.michael.coco.layers;
+package ru.michael.coco.topic;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import ru.michael.coco.level.Level;
 
 import java.util.List;
 
@@ -18,5 +19,4 @@ public class Topic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Boolean isLocked = true;
 }

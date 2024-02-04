@@ -1,4 +1,4 @@
-package ru.michael.coco.layers;
+package ru.michael.coco.level;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;

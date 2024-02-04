@@ -1,8 +1,6 @@
 package ru.michael.coco.attempt;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -19,13 +17,4 @@ public class Response {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @JsonCreator
-    public Response(@JsonProperty("status") String status,
-                    @JsonProperty("output") String output,
-                    @JsonProperty("error") String error) {
-        this.status = status;
-        this.output = output;
-        this.error = error;
-    }
 }
