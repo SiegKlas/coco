@@ -5,9 +5,11 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
 import ru.michael.coco.level_description.LevelDescription;
 import ru.michael.coco.task.Task;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -23,4 +25,6 @@ public class Level {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private Boolean isLocked = true;
+    @Nullable
+    private Date deadLine = null;
 }

@@ -1,7 +1,5 @@
 package ru.michael.coco.task_description;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +42,13 @@ public class TaskDescriptionService {
                 MetaData metaData = objectMapper.readValue(Files.newBufferedReader(metaPath), MetaData.class);
                 String topicName = metaData.getTopic();
                 String taskName = metaData.getTask();
-
-                taskDescriptionRepository.save(new TaskDescription(fName, Integer.parseInt(topic), topicName,
-                        Integer.parseInt(level), Integer.parseInt(number), taskName, path.toString())
+                taskDescriptionRepository.save(
+                        new TaskDescription(fName, Integer.parseInt(number), taskName, path.toString())
                 );
+
+//                taskDescriptionRepository.save(new TaskDescription(fName, Integer.parseInt(topic), topicName,
+//                        Integer.parseInt(level), Integer.parseInt(number), taskName, path.toString())
+//                );
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
@@ -57,11 +58,8 @@ public class TaskDescriptionService {
     }
 
     @Data
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     private static class MetaData {
-        @JsonProperty("topic")
         private String topic;
-        @JsonProperty("task")
         private String task;
     }
 }

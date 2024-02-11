@@ -1,5 +1,6 @@
 package ru.michael.coco.topic;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import ru.michael.coco.level.Level;
 import ru.michael.coco.topic_description.TopicDescription;
 
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -22,4 +24,6 @@ public class Topic {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Nullable
+    private Date deadLine = null;
 }

@@ -14,7 +14,11 @@ public class TopicDescriptionService {
         this.topicDescriptionRepository = topicDescriptionRepository;
     }
 
-    Optional<TopicDescription> findTopicDescriptionByNumber(Integer number) {
+    public Optional<TopicDescription> findTopicDescriptionByNumber(Integer number) {
         return topicDescriptionRepository.findTopicDescriptionByNumber(number);
+    }
+
+    public void deleteAll() {
+        topicDescriptionRepository.deleteAll();
     }
 }

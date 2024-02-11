@@ -8,6 +8,9 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
+
+import java.util.Date;
 
 @Data
 @Entity
@@ -18,4 +21,6 @@ public class LevelDescription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Nullable
+    private Date deadLine = null;
 }

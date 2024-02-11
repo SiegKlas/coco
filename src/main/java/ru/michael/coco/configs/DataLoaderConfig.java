@@ -7,14 +7,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.michael.coco.level_description.LevelDescriptionService;
 import ru.michael.coco.task.Task;
-import ru.michael.coco.task.TaskRepository;
 import ru.michael.coco.task.TaskService;
 import ru.michael.coco.task_description.TaskDescription;
-import ru.michael.coco.task_description.TaskDescriptionRepository;
 import ru.michael.coco.task_description.TaskDescriptionService;
+import ru.michael.coco.topic_description.TopicDescriptionService;
 import ru.michael.coco.user.User;
-import ru.michael.coco.user.UserRepository;
+import ru.michael.coco.user.UserService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -26,38 +26,39 @@ import java.util.stream.Stream;
 
 @Configuration
 public class DataLoaderConfig {
-
+    private final UserService userService;
+    private final TaskService taskService;
+    private final TopicDescriptionService topicDescriptionService;
+    private final LevelDescriptionService levelDescriptionService;
     private final TaskDescriptionService taskDescriptionService;
-    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final TaskRepository taskRepository;
-    private final TaskDescriptionRepository taskDescriptionRepository;
+
     @Value("${file.xbank-dir}")
     private String xbankDir;
     @Value("${file.creds}")
     private String creds;
-    private final TaskService taskService;
 
     @Autowired
-    public DataLoaderConfig(TaskDescriptionService taskDescriptionService, UserRepository userRepository,
-                            PasswordEncoder passwordEncoder, TaskRepository taskRepository,
-                            TaskDescriptionRepository taskDescriptionRepository, TaskService taskService) {
-        this.taskDescriptionService = taskDescriptionService;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.taskRepository = taskRepository;
-        this.taskDescriptionRepository = taskDescriptionRepository;
+    public DataLoaderConfig(UserService userService, TaskService taskService, TopicDescriptionService topicDescriptionService, LevelDescriptionService levelDescriptionService, TaskDescriptionService taskDescriptionService, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
         this.taskService = taskService;
+        this.topicDescriptionService = topicDescriptionService;
+        this.levelDescriptionService = levelDescriptionService;
+        this.taskDescriptionService = taskDescriptionService;
+        this.passwordEncoder = passwordEncoder;
     }
+
 
     @Bean
     public CommandLineRunner tasksLoader() {
         return args -> {
-            taskDescriptionRepository.deleteAll();
+            topicDescriptionService.deleteAll();
             try (Stream<Path> stream = Files.walk(Path.of(xbankDir))) {
                 stream.filter(Files::isDirectory)
                         .skip(1)
-                        .forEach(taskDescriptionService::saveTask);
+                        .forEach(p -> {
+
+                        });
             }
         };
     }
@@ -77,8 +78,7 @@ public class DataLoaderConfig {
                     String login = userData[0];
                     String password = userData[1];
 
-                    User user = new User();
-                    user.setUsername(login);
+                    User user = new User(login);
                     user.setPassword(passwordEncoder.encode(password));
                     user.setRole(User.Role.ADMIN);
                     userRepository.save(user);

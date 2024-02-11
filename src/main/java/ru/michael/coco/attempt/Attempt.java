@@ -5,20 +5,14 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import ru.michael.coco.task.Task;
-import ru.michael.coco.user.User;
 
 @Data
 @Entity
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class Attempt {
-    @ManyToOne
-    private final User user;
-    @ManyToOne
-    private final Task task;
     private final String solutionPath;
-    @OneToOne
+    @Embedded
     private final Response response;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

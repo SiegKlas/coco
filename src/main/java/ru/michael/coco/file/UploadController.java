@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.michael.coco.attempt.Attempt;
 import ru.michael.coco.attempt.AttemptRepository;
 import ru.michael.coco.attempt.Response;
-import ru.michael.coco.attempt.ResponseRepository;
 import ru.michael.coco.task.Task;
 import ru.michael.coco.task.TaskRepository;
 import ru.michael.coco.task.TaskService;
