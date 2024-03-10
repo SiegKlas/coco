@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.michael.coco.attempt.AttemptService;
 import ru.michael.coco.task_description.TaskDescription;
-import ru.michael.coco.user.User;
+import ru.michael.coco.user.UserEntity;
 import ru.michael.coco.user.UserRepository;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class TaskService {
         return taskRepository.findTaskByTaskDescriptionNumber(number);
     }
 
-    public Optional<Task> findTaskByUserAndTaskDescription(User user, TaskDescription taskDescription) {
+    public Optional<Task> findTaskByUserAndTaskDescription(UserEntity user, TaskDescription taskDescription) {
         return taskRepository.findTaskByUserAndTaskDescription(user, taskDescription);
     }
 
@@ -33,7 +33,7 @@ public class TaskService {
         taskRepository.save(task);
     }
 
-    public List<Task> findTasksByUser(User user) {
+    public List<Task> findTasksByUser(UserEntity user) {
         return taskRepository.findTasksByUser(user);
     }
 

@@ -8,7 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.michael.coco.task.Task;
 import ru.michael.coco.task.TaskService;
-import ru.michael.coco.user.User;
+import ru.michael.coco.user.UserEntity;
 import ru.michael.coco.user.UserService;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class LoginController {
 
     @GetMapping("/")
     public String home(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
+        UserEntity user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
         List<Task> tasks = taskService.findTasksByUser(user);
         Integer solvedCount = Math.toIntExact(tasks.stream().map(taskService::getStatus).filter(e -> e.equals(Task.STATUS.SUCCESS)).count());
         Integer errorsCount = Math.toIntExact(tasks.stream().map(taskService::getStatus).filter(e -> e.equals(Task.STATUS.FAIL)).count());

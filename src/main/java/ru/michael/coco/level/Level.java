@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.michael.coco.level_description.LevelDescription;
-import ru.michael.coco.user.User;
+import ru.michael.coco.user.UserEntity;
 
 @Data
 @Entity
@@ -14,7 +14,7 @@ import ru.michael.coco.user.User;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class Level {
     @ManyToOne
-    private final User user;
+    private final UserEntity user;
     @ManyToOne
     private final LevelDescription levelDescription;
     @Id

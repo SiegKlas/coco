@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class TaskDescriptionDTO {
-    private final Integer number;
-    private final String name;
+    private Integer number;
+    private String name;
 }

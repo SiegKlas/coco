@@ -15,7 +15,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public Optional<User> findByUsername(String username) {
+    public Optional<UserEntity> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
@@ -23,11 +23,11 @@ public class UserService {
         this.userRepository.deleteAll();
     }
 
-    public void save(User user) {
+    public void save(UserEntity user) {
         this.userRepository.save(user);
     }
 
-    public List<User> findAll() {
+    public List<UserEntity> findAll() {
         return userRepository.findAll();
     }
 }

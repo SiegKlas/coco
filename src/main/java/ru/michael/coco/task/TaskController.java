@@ -1,6 +1,5 @@
 package ru.michael.coco.task;
 
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +21,7 @@ import ru.michael.coco.topic_description.TopicDescription;
 import ru.michael.coco.topic_description.TopicDescriptionDTO;
 import ru.michael.coco.topic_description.TopicDescriptionMapper;
 import ru.michael.coco.topic_description.TopicDescriptionService;
-import ru.michael.coco.user.User;
+import ru.michael.coco.user.UserEntity;
 import ru.michael.coco.user.UserService;
 
 import java.nio.file.Paths;
@@ -42,11 +41,11 @@ public class TaskController {
     private final LevelDescriptionService levelDescriptionService;
 
     @Autowired
-    public TaskController(TaskDescriptionService taskDescriptionService, TaskService taskService, UserService userService,
+    public TaskController(TaskDescriptionMapper taskDescriptionMapper, LevelDescriptionMapper levelDescriptionMapper, TopicDescriptionMapper topicDescriptionMapper, TaskDescriptionService taskDescriptionService, TaskService taskService, UserService userService,
                           TopicDescriptionService topicDescriptionService, LevelDescriptionService levelDescriptionService) {
-        this.taskDescriptionMapper = Mappers.getMapper(TaskDescriptionMapper.class);
-        this.levelDescriptionMapper = Mappers.getMapper(LevelDescriptionMapper.class);
-        this.topicDescriptionMapper = Mappers.getMapper(TopicDescriptionMapper.class);
+        this.taskDescriptionMapper = taskDescriptionMapper;
+        this.levelDescriptionMapper = levelDescriptionMapper;
+        this.topicDescriptionMapper = topicDescriptionMapper;
         this.taskDescriptionService = taskDescriptionService;
         this.taskService = taskService;
         this.userService = userService;
@@ -83,7 +82,7 @@ public class TaskController {
             model.addAttribute("topicNumber", topicNumber.orElseThrow());
             model.addAttribute("levelNumber", levelNumber.orElseThrow());
 
-            User user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
+            UserEntity user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
             List<TaskDescription> taskDescriptions =
                     taskDescriptionService.findTaskDescriptionsByTopicNumberAndLevelNumberSorted(
                             topicNumber.orElseThrow(), levelNumber.orElseThrow()
@@ -112,7 +111,7 @@ public class TaskController {
             model.addAttribute("taskDescriptionDTO", taskDescriptionDTO);
 
             model.addAttribute("dir_name", taskDescription.getFileName());
-            User user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
+            UserEntity user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
             Task task = taskService.findTaskByUserAndTaskDescription(user, taskDescription).orElseThrow();
             List<Attempt> attempts = task.getAttempts();
             List<String> fileNames = attempts.stream()

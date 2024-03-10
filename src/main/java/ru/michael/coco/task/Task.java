@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import ru.michael.coco.attempt.Attempt;
 import ru.michael.coco.task_description.TaskDescription;
-import ru.michael.coco.user.User;
+import ru.michael.coco.user.UserEntity;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class Task {
     @ManyToOne
-    private final User user;
+    private final UserEntity user;
     @ManyToOne
     private final TaskDescription taskDescription;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

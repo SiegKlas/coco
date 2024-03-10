@@ -5,7 +5,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import ru.michael.coco.user.User;
+import ru.michael.coco.user.UserEntity;
 
 import java.time.LocalDateTime;
 
@@ -23,7 +23,7 @@ public class FileEntity {
 
     private final String filePath;
     @ManyToOne
-    private final User user;
+    private final UserEntity user;
 
     private final LocalDateTime uploadTime;
 }

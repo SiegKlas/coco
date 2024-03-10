@@ -19,8 +19,7 @@ import java.util.List;
 @Entity
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PUBLIC, force = true)
-@Table(name = "_user")
-public class User implements UserDetails {
+public class UserEntity implements UserDetails {
     private Role role;
 
     @Override

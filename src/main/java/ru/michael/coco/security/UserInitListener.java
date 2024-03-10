@@ -4,7 +4,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.michael.coco.user.User;
+import ru.michael.coco.user.UserEntity;
 import ru.michael.coco.user.UserRepository;
 
 //@Component
@@ -22,15 +22,15 @@ public class UserInitListener implements ApplicationListener<ContextRefreshedEve
     @Override
     public void onApplicationEvent(@NonNull ContextRefreshedEvent event) {
         if (userRepository.findByUsername("user").isEmpty()) {
-            User user = new User("user");
+            UserEntity user = new UserEntity("user");
             user.setPassword(passwordEncoder.encode("123"));
-            user.setRole(User.Role.USER);
+            user.setRole(UserEntity.Role.USER);
             userRepository.save(user);
         }
         if (userRepository.findByUsername("admin").isEmpty()) {
-            User admin = new User("admin");
+            UserEntity admin = new UserEntity("admin");
             admin.setPassword(passwordEncoder.encode("123"));
-            admin.setRole(User.Role.ADMIN);
+            admin.setRole(UserEntity.Role.ADMIN);
             userRepository.save(admin);
         }
     }

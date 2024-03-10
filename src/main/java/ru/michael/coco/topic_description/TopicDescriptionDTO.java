@@ -7,7 +7,7 @@ import java.util.Set;
 
 @Data
 public class TopicDescriptionDTO {
-    private final Integer number;
-    private final String name;
-    private final Set<LevelDescriptionDTO> levelDescriptionDTOSet;
+    private Integer number;
+    private String name;
+    private Set<LevelDescriptionDTO> levelDescriptionDTOSet;
 }
