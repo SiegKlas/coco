@@ -7,6 +7,6 @@ import java.util.Set;
 
 @Data
 public class LevelDescriptionDTO {
-    private final Integer number;
-    private final Set<TaskDescriptionDTO> taskDescriptionDTOSet;
+    private Integer number;
+    private Set<TaskDescriptionDTO> taskDescriptionDTOSet;
 }

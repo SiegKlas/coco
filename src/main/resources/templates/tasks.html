@@ -126,7 +126,7 @@
         <li class="list-item list-item-1"
             th:classappend="${areLevelsLocked[iterStat.index]} ? 'status-light-gray' : ''"
             th:each="l, iterStat : ${levelDescriptionDTOS}"
-            th:onclick="${areLevelsLocked[iterStat.index]} ? null : 'redirectTo(\'' + ${topic} + '\', ' + ${l} + ', null)'"
+            th:onclick="${areLevelsLocked[iterStat.index]} ? null : 'redirectTo(\'' + ${topicNumber} + '\', ' + ${l.getNumber()} + ', null)'"
             th:text="${l.getNumber()}"></li>
     </ul>
     <button class="button-back" onclick="location.href='/tasks'">Topics</button>
@@ -143,11 +143,12 @@
             th:text="${t.getName()}">
         </li>
     </ul>
-    <button class="button-back" th:onclick="'redirectTo(\'' + ${topic} + '\', null, null)'">Levels</button>
+    <button class="button-back" th:onclick="'redirectTo(\'' + ${topicNumber} + '\', null, null)'">Levels</button>
 </div>
 <div th:if="${taskDescriptionDTO != null}">
     <h2 th:text="'Task ' + ${dir_name}">Task</h2>
-    <button class="button-back" th:onclick="'redirectTo(\'' + ${topic} + '\', ' + ${level} + ', null)'">Exercises
+    <button class="button-back" th:onclick="'redirectTo(\'' + ${topicNumber} + '\', ' + ${levelNumber} + ', null)'">
+        Exercises
     </button>
     <div th:if="${dir_name != null}">
         <iframe
@@ -161,9 +162,9 @@
     <a class="btn btn-primary" th:href="@{/asm/{filename}(filename=${dir_name})}">Download asm File</a>
     <h3>Upload Solution</h3>
     <form action="/upload/solution" enctype="multipart/form-data" method="POST">
-        <input name="topic" th:value="${topic}" type="hidden"/>
-        <input name="level" th:value="${level}" type="hidden"/>
-        <input name="number" th:value="${number}" type="hidden"/>
+        <input name="topicNumber" th:value="${topicNumber}" type="hidden"/>
+        <input name="levelNumber" th:value="${levelNumber}" type="hidden"/>
+        <input name="taskNumber" th:value="${taskNumber}" type="hidden"/>
         <input name="dir_name" th:value="${dir_name}" type="hidden"/>
         <input name="file" type="file"/>
         <button type="submit">Upload</button>
@@ -205,7 +206,7 @@
             if (level) {
                 url += '&level=' + level;
                 if (number) {
-                    url += '&number=' + number;
+                    url += '&task=' + number;
                 }
             }
         }

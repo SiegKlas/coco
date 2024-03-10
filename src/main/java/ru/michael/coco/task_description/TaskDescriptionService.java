@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.michael.coco.level_description.LevelDescription;
 import ru.michael.coco.level_description.LevelDescriptionService;
 import ru.michael.coco.topic_description.TopicDescription;
@@ -68,6 +69,7 @@ public class TaskDescriptionService {
         }
     }
 
+    @Transactional
     public void createTaskDescriptionByPath(Path path) throws IOException {
         var taskInfo = taskInfo(path);
         Optional<TopicDescription> topicDescriptionOptional =

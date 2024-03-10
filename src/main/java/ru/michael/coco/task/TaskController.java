@@ -1,6 +1,5 @@
 package ru.michael.coco.task;
 
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,11 +41,11 @@ public class TaskController {
     private final LevelDescriptionService levelDescriptionService;
 
     @Autowired
-    public TaskController(TaskDescriptionService taskDescriptionService, TaskService taskService, UserService userService,
+    public TaskController(TaskDescriptionMapper taskDescriptionMapper, LevelDescriptionMapper levelDescriptionMapper, TopicDescriptionMapper topicDescriptionMapper, TaskDescriptionService taskDescriptionService, TaskService taskService, UserService userService,
                           TopicDescriptionService topicDescriptionService, LevelDescriptionService levelDescriptionService) {
-        this.taskDescriptionMapper = Mappers.getMapper(TaskDescriptionMapper.class);
-        this.levelDescriptionMapper = Mappers.getMapper(LevelDescriptionMapper.class);
-        this.topicDescriptionMapper = Mappers.getMapper(TopicDescriptionMapper.class);
+        this.taskDescriptionMapper = taskDescriptionMapper;
+        this.levelDescriptionMapper = levelDescriptionMapper;
+        this.topicDescriptionMapper = topicDescriptionMapper;
         this.taskDescriptionService = taskDescriptionService;
         this.taskService = taskService;
         this.userService = userService;
@@ -55,9 +54,9 @@ public class TaskController {
     }
 
     @GetMapping
-    public String getTasks(@RequestParam Optional<Integer> topicNumber,
-                           @RequestParam Optional<Integer> levelNumber,
-                           @RequestParam Optional<Integer> taskNumber,
+    public String getTasks(@RequestParam(name = "topic") Optional<Integer> topicNumber,
+                           @RequestParam(name = "level") Optional<Integer> levelNumber,
+                           @RequestParam(name = "task") Optional<Integer> taskNumber,
                            Model model,
                            @AuthenticationPrincipal UserDetails userDetails) {
         if (topicNumber.isEmpty() && levelNumber.isEmpty() && taskNumber.isEmpty()) {

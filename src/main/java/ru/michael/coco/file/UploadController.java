@@ -48,9 +48,9 @@ public class UploadController {
     public String handleSolutionUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request,
                                        @AuthenticationPrincipal UserDetails userDetails,
                                        @RequestParam("dir_name") String dirName,
-                                       @RequestParam("topic") Integer topic,
-                                       @RequestParam("level") Integer level,
-                                       @RequestParam("number") Integer number) {
+                                       @RequestParam("topicNumber") Integer topic,
+                                       @RequestParam("levelNumber") Integer level,
+                                       @RequestParam("taskNumber") Integer number) {
         try {
             String fullPath = FileManager.moveMultipartFileToSubfolder(Path.of(solutionsDir),
                     userDetails.getUsername(), file);

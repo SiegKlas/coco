@@ -10,6 +10,7 @@ import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.topic_description.TopicDescription;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -27,4 +28,17 @@ public class LevelDescription {
     private Long id;
     @Nullable
     private Date deadLine = null;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number, topicDescription);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof LevelDescription that)) return false;
+        return Objects.equals(number, that.number) &&
+                Objects.equals(topicDescription, that.topicDescription);
+    }
 }

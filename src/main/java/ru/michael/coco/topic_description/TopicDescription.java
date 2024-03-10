@@ -9,6 +9,7 @@ import org.springframework.lang.Nullable;
 import ru.michael.coco.level_description.LevelDescription;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -25,4 +26,18 @@ public class TopicDescription {
     private Long id;
     @Nullable
     private Date deadLine = null;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(number, name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TopicDescription that)) return false;
+        return Objects.equals(number, that.number) &&
+                Objects.equals(name, that.name);
+    }
+
 }
