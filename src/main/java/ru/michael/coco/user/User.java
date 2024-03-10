@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.michael.coco.level.Level;
+import ru.michael.coco.task.Task;
 import ru.michael.coco.topic.Topic;
 
 import java.util.Collection;
@@ -33,6 +35,10 @@ public class User implements UserDetails {
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Topic> topics;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Level> levels;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<Task> tasks;
 
     public enum Role {
         USER, ADMIN

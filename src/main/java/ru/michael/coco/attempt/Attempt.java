@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import ru.michael.coco.task.Task;
 
 @Data
 @Entity
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class Attempt {
     private final String solutionPath;
+    @ManyToOne
+    private final Task task;
     @Embedded
     private final Response response;
     @Id

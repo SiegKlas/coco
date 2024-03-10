@@ -5,26 +5,20 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.Nullable;
 import ru.michael.coco.level_description.LevelDescription;
-import ru.michael.coco.task.Task;
-
-import java.util.Date;
-import java.util.List;
+import ru.michael.coco.user.User;
 
 @Data
 @Entity
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class Level {
-    @OneToMany
-    private final List<Task> tasks;
+    @ManyToOne
+    private final User user;
     @ManyToOne
     private final LevelDescription levelDescription;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Boolean isLocked = true;
-    @Nullable
-    private Date deadLine = null;
+    private final Integer pass;
 }

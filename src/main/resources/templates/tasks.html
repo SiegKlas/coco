@@ -30,11 +30,11 @@
         }
 
         .status-light-green {
-            background-color: #e9f7ef; /* Очень светлый зеленый */
+            background-color: #e9f7ef;
         }
 
         .status-light-red {
-            background-color: #fce8e6; /* Очень светлый красный */
+            background-color: #fce8e6;
         }
 
         .button-back {
@@ -103,49 +103,49 @@
         }
 
         .list-item-1:hover {
-            background-color: #e0e0e0; /* Очень светлый серый */
-            cursor: default; /* Используйте "default" для стандартной стрелочки курсора */
+            background-color: #e0e0e0;
+            cursor: default;
         }
 
 
     </style>
 </head>
 <body>
-<div th:if="${not #lists.isEmpty(topics)}">
+<div th:if="${not #lists.isEmpty(topicDescriptionDTOS)}">
     <h2>Topics</h2>
     <ul class="list-container">
         <li class="list-item"
-            th:each="t,iterStat : ${topics}"
-            th:onclick="'redirectTo(\'' + ${t} + '\', null, null)'"
-            th:text="${topicsNames[iterStat.index]}"></li>
+            th:each="t : ${topicDescriptionDTOS}"
+            th:onclick="'redirectTo(\'' + ${t.getNumber()} + '\', null, null)'"
+            th:text="${t.getName()}"></li>
     </ul>
 </div>
-<div th:if="${not #lists.isEmpty(levels)}">
+<div th:if="${not #lists.isEmpty(levelDescriptionDTOS)}">
     <h2>Levels</h2>
     <ul class="list-container">
         <li class="list-item list-item-1"
             th:classappend="${areLevelsLocked[iterStat.index]} ? 'status-light-gray' : ''"
-            th:each="l, iterStat : ${levels}"
+            th:each="l, iterStat : ${levelDescriptionDTOS}"
             th:onclick="${areLevelsLocked[iterStat.index]} ? null : 'redirectTo(\'' + ${topic} + '\', ' + ${l} + ', null)'"
-            th:text="${l}"></li>
+            th:text="${l.getNumber()}"></li>
     </ul>
     <button class="button-back" onclick="location.href='/tasks'">Topics</button>
 </div>
 
-<div th:if="${not #lists.isEmpty(numbers)}">
+<div th:if="${not #lists.isEmpty(taskDescriptionDTOS)}">
     <h2>Exercises</h2>
     <ul class="list-container">
         <li class="list-item"
-            th:classappend="${tasks[iterStat.index].status == 2 ? 'status-green' :
-                            (tasks[iterStat.index].status == 1 ? 'status-red' : '')}"
-            th:each="n, iterStat : ${numbers}"
-            th:onclick="'redirectTo(\'' + ${topic} + '\', ' + ${level} + ', ' + ${n} + ')'"
-            th:text="${tasks[iterStat.index].getTaskDescription().getName()}">
+            th:classappend="${statuses[iterStat.index].name() == 'SUCCESS' ? 'status-green' :
+                            (statuses[iterStat.index].name() == 'FAIL' ? 'status-red' : '')}"
+            th:each="t, iterStat : ${taskDescriptionDTOS}"
+            th:onclick="'redirectTo(\'' + ${topicNumber} + '\', ' + ${levelNumber} + ', ' + ${t.getNumber()} + ')'"
+            th:text="${t.getName()}">
         </li>
     </ul>
     <button class="button-back" th:onclick="'redirectTo(\'' + ${topic} + '\', null, null)'">Levels</button>
 </div>
-<div th:if="${task_description != null}">
+<div th:if="${taskDescriptionDTO != null}">
     <h2 th:text="'Task ' + ${dir_name}">Task</h2>
     <button class="button-back" th:onclick="'redirectTo(\'' + ${topic} + '\', ' + ${level} + ', null)'">Exercises
     </button>

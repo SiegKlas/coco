@@ -5,11 +5,10 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.lang.Nullable;
 import ru.michael.coco.attempt.Attempt;
 import ru.michael.coco.task_description.TaskDescription;
+import ru.michael.coco.user.User;
 
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -18,14 +17,18 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class Task {
     @ManyToOne
+    private final User user;
+    @ManyToOne
     private final TaskDescription taskDescription;
-    @OneToMany
-    private final List<Attempt> attempt;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<Attempt> attempts;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer status = 0;
-    private Boolean isLocked = true;
-    @Nullable
-    private Date deadLine = null;
+
+    public enum STATUS {
+        SUCCESS,
+        FAIL,
+        UNSOLVED
+    }
 }

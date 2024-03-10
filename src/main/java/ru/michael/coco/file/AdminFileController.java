@@ -89,7 +89,13 @@ public class AdminFileController {
         try (Stream<Path> stream = Files.walk(Path.of(xbankDir))) {
             stream.filter(Files::isDirectory)
                     .skip(1)
-                    .forEach(taskDescriptionService::saveTask);
+                    .forEach(path -> {
+                        try {
+                            taskDescriptionService.createTaskDescriptionByPath(path);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
         }
 
         List<User> users = userRepository.findAll();

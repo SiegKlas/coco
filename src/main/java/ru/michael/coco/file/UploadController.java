@@ -14,47 +14,34 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import ru.michael.coco.attempt.Attempt;
-import ru.michael.coco.attempt.AttemptRepository;
 import ru.michael.coco.attempt.Response;
 import ru.michael.coco.task.Task;
-import ru.michael.coco.task.TaskRepository;
 import ru.michael.coco.task.TaskService;
 import ru.michael.coco.task_description.TaskDescription;
-import ru.michael.coco.task_description.TaskDescriptionRepository;
+import ru.michael.coco.task_description.TaskDescriptionService;
 import ru.michael.coco.user.User;
-import ru.michael.coco.user.UserRepository;
+import ru.michael.coco.user.UserService;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @Controller
 @RequestMapping("/upload")
 public class UploadController {
-    private final UserRepository userRepository;
-    private final FileRepository fileRepository;
-    private final ResponseRepository responseRepository;
-    private final TaskRepository taskRepository;
-    private final TaskDescriptionRepository taskDescriptionRepository;
-    private final AttemptRepository attemptRepository;
+    private final TaskService taskService;
+    private final UserService userService;
+    private final TaskDescriptionService taskDescriptionService;
     @Value("${file.solutions}")
     private String solutionsDir;
-    private final TaskService taskService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
-    public UploadController(UserRepository userRepository, FileRepository fileRepository,
-                            ResponseRepository responseRepository, TaskRepository taskRepository,
-                            TaskDescriptionRepository taskDescriptionRepository, AttemptRepository attemptRepository, TaskService taskService) {
-        this.userRepository = userRepository;
-        this.fileRepository = fileRepository;
-        this.responseRepository = responseRepository;
-        this.taskRepository = taskRepository;
-        this.taskDescriptionRepository = taskDescriptionRepository;
-        this.attemptRepository = attemptRepository;
+    public UploadController(TaskService taskService, UserService userService, TaskDescriptionService taskDescriptionService) {
         this.taskService = taskService;
+        this.userService = userService;
+        this.taskDescriptionService = taskDescriptionService;
     }
 
     @PostMapping("/solution")
@@ -70,36 +57,22 @@ public class UploadController {
 
             String otherServerUrl = "http://127.0.0.1:5000/api/check";
             RestTemplate restTemplate = new RestTemplate();
-            User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
-            FileEntity fileEntity = new FileEntity(
-                    file.getOriginalFilename(),
-                    file.getContentType(),
-                    fullPath,
-                    user,
-                    LocalDateTime.now()
-            );
-            fileRepository.save(fileEntity);
+            User user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
+
             final Map<String, String> json = new HashMap<>();
             json.put("fileName", file.getOriginalFilename());
             json.put("filePath", fullPath);
             json.put("dirName", dirName);
             ResponseEntity<String> responseEntity = restTemplate.postForEntity(otherServerUrl, json, String.class);
             Response response = objectMapper.readValue(responseEntity.getBody(), Response.class);
-            responseRepository.save(response);
 
-            TaskDescription taskDescription =
-                    taskDescriptionRepository.findTaskDescriptionByTopicAndLevelAndNumber(topic, level, number);
-            Task task = taskRepository.findTaskByUserAndTaskDescription(user, taskDescription);
+            TaskDescription taskDescription = taskDescriptionService.findTaskDescriptionByTopicNumberAndLevelNumberAndTaskNumber(
+                    topic, level, number
+            ).orElseThrow();
+            Task task = taskService.findTaskByUserAndTaskDescription(user, taskDescription).orElseThrow();
 
-            Attempt attempt = new Attempt(user, task, fullPath, response);
-            attemptRepository.save(attempt);
-            task.getAttempt().add(attempt);
-
-            if (response.getStatus().equals("success")) {
-                task.setStatus(2);
-            } else if (!task.getStatus().equals(2)) {
-                task.setStatus(1);
-            }
+            Attempt attempt = new Attempt(fullPath, task, response);
+            task.getAttempts().add(attempt);
 
             taskService.save(task);
         } catch (IOException e) {

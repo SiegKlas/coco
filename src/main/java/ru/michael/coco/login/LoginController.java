@@ -1,26 +1,29 @@
 package ru.michael.coco.login;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.michael.coco.task.Task;
-import ru.michael.coco.task.TaskRepository;
+import ru.michael.coco.task.TaskService;
 import ru.michael.coco.user.User;
-import ru.michael.coco.user.UserRepository;
+import ru.michael.coco.user.UserService;
 
 import java.util.List;
 
 @Controller
 public class LoginController {
-    private final TaskRepository taskRepository;
-    private final UserRepository userRepository;
+    private final UserService userService;
+    private final TaskService taskService;
 
-    public LoginController(TaskRepository taskRepository, UserRepository userRepository) {
-        this.taskRepository = taskRepository;
-        this.userRepository = userRepository;
+    @Autowired
+    public LoginController(UserService userService, TaskService taskService) {
+        this.userService = userService;
+        this.taskService = taskService;
     }
+
 
     @GetMapping("/login")
     public String login() {
@@ -29,11 +32,11 @@ public class LoginController {
 
     @GetMapping("/")
     public String home(Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userRepository.findByUsername(userDetails.getUsername()).orElseThrow();
-        List<Task> tasks = taskRepository.findTasksByUser(user);
-        Integer solvedCount = Math.toIntExact(tasks.stream().map(Task::getStatus).filter(e -> e.equals(2)).count());
-        Integer errorsCount = Math.toIntExact(tasks.stream().map(Task::getStatus).filter(e -> e.equals(1)).count());
-        Integer unsolvedCount = Math.toIntExact(tasks.stream().map(Task::getStatus).filter(e -> e.equals(0)).count());
+        User user = userService.findByUsername(userDetails.getUsername()).orElseThrow();
+        List<Task> tasks = taskService.findTasksByUser(user);
+        Integer solvedCount = Math.toIntExact(tasks.stream().map(taskService::getStatus).filter(e -> e.equals(Task.STATUS.SUCCESS)).count());
+        Integer errorsCount = Math.toIntExact(tasks.stream().map(taskService::getStatus).filter(e -> e.equals(Task.STATUS.FAIL)).count());
+        Integer unsolvedCount = Math.toIntExact(tasks.stream().map(taskService::getStatus).filter(e -> e.equals(Task.STATUS.UNSOLVED)).count());
         model.addAttribute("solved", solvedCount);
         model.addAttribute("errors", errorsCount);
         model.addAttribute("unsolved", unsolvedCount);

@@ -18,6 +18,7 @@ import ru.michael.coco.user.UserService;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -57,7 +58,11 @@ public class DataLoaderConfig {
                 stream.filter(Files::isDirectory)
                         .skip(1)
                         .forEach(p -> {
-
+                            try {
+                                taskDescriptionService.createTaskDescriptionByPath(p);
+                            } catch (IOException e) {
+                                throw new RuntimeException(e);
+                            }
                         });
             }
         };
@@ -66,7 +71,7 @@ public class DataLoaderConfig {
     @Bean
     public CommandLineRunner userLoader() {
         return args -> {
-            userRepository.deleteAll();
+            userService.deleteAll();
 
             String line;
             String csvSplitBy = ",";
@@ -81,7 +86,7 @@ public class DataLoaderConfig {
                     User user = new User(login);
                     user.setPassword(passwordEncoder.encode(password));
                     user.setRole(User.Role.ADMIN);
-                    userRepository.save(user);
+                    userService.save(user);
                 }
             }
         };
@@ -91,14 +96,11 @@ public class DataLoaderConfig {
     @DependsOn({"tasksLoader", "userLoader"})
     public CommandLineRunner tasksInit() {
         return args -> {
-            List<User> users = userRepository.findAll();
-            List<TaskDescription> descriptions = taskDescriptionRepository.findAll();
+            List<User> users = userService.findAll();
+            List<TaskDescription> descriptions = taskDescriptionService.findAll();
 
             users.forEach(u -> descriptions.forEach(d -> {
                 Task task = new Task(u, d, new ArrayList<>());
-                if (task.getTaskDescription().getLevel().equals(1)) {
-                    task.setIsLocked(false);
-                }
                 taskService.save(task);
             }));
         };

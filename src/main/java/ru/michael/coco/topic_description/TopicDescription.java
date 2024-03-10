@@ -1,16 +1,15 @@
 package ru.michael.coco.topic_description;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
+import ru.michael.coco.level_description.LevelDescription;
 
 import java.util.Date;
+import java.util.Set;
 
 @Data
 @Entity
@@ -19,7 +18,8 @@ import java.util.Date;
 public class TopicDescription {
     private final Integer number;
     private final String name;
-    private final String named;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private final Set<LevelDescription> levelDescriptions;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
