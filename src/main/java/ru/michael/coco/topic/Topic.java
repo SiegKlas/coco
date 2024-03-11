@@ -24,5 +24,7 @@ public class Topic {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Nullable
+    private Integer pass = null;
+    @Nullable
     private Date deadLine = null;
 }

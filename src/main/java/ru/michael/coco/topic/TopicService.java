@@ -2,6 +2,8 @@ package ru.michael.coco.topic;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.michael.coco.topic_description.TopicDescription;
+import ru.michael.coco.user.User;
 
 import java.util.Optional;
 
@@ -14,7 +16,15 @@ public class TopicService {
         this.topicRepository = topicRepository;
     }
 
-    Optional<Topic> findTopicByTopicDescriptionNumber(Integer number) {
+    public Optional<Topic> findTopicByTopicDescriptionNumber(Integer number) {
         return topicRepository.findTopicByTopicDescriptionNumber(number);
+    }
+
+    public Optional<Topic> findTopicByUserAndTopicDescription(User user, TopicDescription topicDescription) {
+        return topicRepository.findTopicByUserAndTopicDescription(user, topicDescription);
+    }
+
+    public void save(Topic topic) {
+        topicRepository.save(topic);
     }
 }
