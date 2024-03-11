@@ -26,6 +26,8 @@ public class TopicDescription {
     private Long id;
     @Nullable
     private Date deadLine = null;
+    @Nullable
+    private Integer pass = null;
 
     @Override
     public int hashCode() {
@@ -39,5 +41,4 @@ public class TopicDescription {
         return Objects.equals(number, that.number) &&
                 Objects.equals(name, that.name);
     }
-
 }

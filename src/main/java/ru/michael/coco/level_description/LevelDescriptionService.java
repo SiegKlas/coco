@@ -26,4 +26,8 @@ public class LevelDescriptionService {
     public List<LevelDescription> findAllByTopicDescriptionNumberSorted(Integer topicDescriptionNumber) {
         return levelDescriptionRepository.findAllByTopicDescription_NumberOrderByNumberAsc(topicDescriptionNumber);
     }
+
+    public void save(LevelDescription levelDescription) {
+        levelDescriptionRepository.save(levelDescription);
+    }
 }

@@ -20,5 +20,5 @@ public class Level {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private final Integer pass;
+    private Integer pass;
 }

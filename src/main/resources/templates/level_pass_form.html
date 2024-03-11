@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Level Pass Criteria</title>
+</head>
+<body>
+<h2>Edit Level Pass Criteria</h2>
+<form action="#"
+      method="post"
+      th:action="@{/admin/deadlines/pass/level/{levelNumber}/topic/{topicNumber}(levelNumber=${levelNumber}, topicNumber=${topicNumber})}">
+    <label for="pass">Pass Criteria:</label>
+    <input id="pass" name="pass" th:value="${level.pass}" type="number">
+    <button type="submit">Save</button>
+</form>
+</body>
+</html>

@@ -9,6 +9,5 @@ import java.util.Optional;
 @Repository
 public interface TopicDescriptionRepository extends JpaRepository<TopicDescription, Long> {
     Optional<TopicDescription> findTopicDescriptionByNumber(Integer number);
-
     List<TopicDescription> findAllByOrderByNumberAsc();
 }

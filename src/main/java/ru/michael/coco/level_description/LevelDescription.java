@@ -9,7 +9,6 @@ import org.springframework.lang.Nullable;
 import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.topic_description.TopicDescription;
 
-import java.util.Date;
 import java.util.Objects;
 import java.util.Set;
 
@@ -27,7 +26,7 @@ public class LevelDescription {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Nullable
-    private Date deadLine = null;
+    private Integer pass = null;
 
     @Override
     public int hashCode() {
