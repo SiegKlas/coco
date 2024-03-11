@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.lang.Nullable;
 import ru.michael.coco.level_description.LevelDescription;
 import ru.michael.coco.user.User;
 
@@ -20,5 +21,6 @@ public class Level {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer pass;
+    @Nullable
+    private Integer pass = null;
 }

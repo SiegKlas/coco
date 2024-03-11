@@ -1,12 +1,10 @@
 package ru.michael.coco.admin.deadlines;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import ru.michael.coco.level_description.LevelDescription;
 import ru.michael.coco.level_description.LevelDescriptionDTO;
 import ru.michael.coco.level_description.LevelDescriptionMapper;
@@ -16,10 +14,9 @@ import ru.michael.coco.topic_description.TopicDescriptionDTO;
 import ru.michael.coco.topic_description.TopicDescriptionMapper;
 import ru.michael.coco.topic_description.TopicDescriptionService;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Controller
 @RequestMapping("/admin/deadlines")
@@ -57,12 +54,21 @@ public class AdminDeadlinesController {
         return levels.stream().map(levelDescriptionMapper::toDTO).toList();
     }
 
-    private Date parseDate(String date) {
+    @PostMapping("/global")
+    public ResponseEntity<String> processDeadlines(@RequestParam("topic") Integer topicNumber,
+                                                   @RequestParam("level") Integer levelNumber,
+                                                   @RequestParam("deadLine") Date deadLine,
+                                                   @RequestParam("passTopic") Integer passTopic,
+                                                   @RequestParam("passLevel") Integer passLevel) {
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            return dateFormat.parse(date);
-        } catch (ParseException e) {
-            return null;
+            LevelDescription levelDescription =
+                    levelDescriptionService.findLevelDescriptionByTopicDescriptionNumberAndNumber(topicNumber, levelNumber).orElseThrow();
+            levelDescription.setPass(passLevel);
+            levelDescription.getTopicDescription().setPass(passTopic);
+            levelDescription.getTopicDescription().setDeadLine(deadLine);
+            return ResponseEntity.ok("Data received successfully!");
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().body("No such topic or level");
         }
     }
 }

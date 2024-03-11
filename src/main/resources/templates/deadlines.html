@@ -7,18 +7,19 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     <style>
-        .slider-container {
+        .topic-container {
             margin-top: 10px;
         }
 
+        .level-container {
+            margin-top: 10px;
+        }
         .slider-label {
             margin-bottom: 5px;
         }
-
         .slider {
             width: 200px;
         }
-
         #datepicker {
             margin-top: 10px;
         }
@@ -35,93 +36,94 @@
             <option value="">Выберите тему</option>
             <option th:each="topic : ${topics}" th:text="${topic.name}" th:value="${topic.number}"></option>
         </select>
-        <div id="levelContainer"></div>
-        <script th:inline="javascript">
-            document.getElementById('topic').addEventListener('change', function () {
-                var topicNumber = this.value;
-                document.getElementById('levelContainer').innerHTML = '';
-                fetch('/admin/deadlines/levels?topicNumber=' + topicNumber)
-                    .then(response => response.json())
-                    .then(data => {
-                        var select = document.createElement('select');
-                        select.name = 'level';
-                        select.id = 'level';
-                        data.forEach(function (level) {
-                            var option = document.createElement('option');
-                            option.value = level.number;
-                            option.text = 'Level ' + level.number;
-                            select.appendChild(option);
-                        });
-                        document.getElementById('levelContainer').appendChild(select);
-                    });
-            });
-        </script>
-        <div id="datepicker"></div>
-        <div class="slider-container">
+
+        <div id="levelContainer" style="display: none;"></div>
+
+        <div id="datepicker" style="display: none;"></div>
+
+        <div class="topic-container" style="display: none;">
             <label class="slider-label" for="passTopic">Pass для темы:</label>
             <input id="passTopic" name="passTopic" type="text">
         </div>
-        <div class="slider-container">
+
+        <div class="level-container" style="display: none;">
             <label class="slider-label" for="passLevel">Pass для уровня:</label>
             <input id="passLevel" name="passLevel" type="text">
         </div>
-        <button id="submitButton" type="button">Подтвердить</button>
+
+        <button id="submitButton" style="display: none;" type="button">Подтвердить</button>
     </div>
 
 </form>
 
+<button id="globalButton" type="button">Global</button>
+<button formaction="/admin/deadlines/students" type="submit">Students</button>
+
 <script th:inline="javascript">
-    // Добавляем слайдеры для выбора значения pass
     $(function () {
-        $("#passTopic").slider({
+        $("#passTopic, #passLevel").slider({
             range: "min",
             value: 0,
             min: 0,
             max: 100,
             slide: function (event, ui) {
-                $("#passTopicValue").val(ui.value);
+                $(this).prev().val(ui.value);
             }
         });
-        $("#passLevel").slider({
-            range: "min",
-            value: 0,
-            min: 0,
-            max: 100,
-            slide: function (event, ui) {
-                $("#passLevelValue").val(ui.value);
-            }
-        });
-    });
 
-    // Устанавливаем календарь для выбора даты
-    $(function () {
         $("#datepicker").datepicker();
-    });
 
-    // Обработчик нажатия кнопки "Подтвердить"
-    $('#submitButton').click(function () {
-        var topic = $('#topic').val();
-        var level = $('#level').val();
-        var deadLine = $('#datepicker').datepicker("getDate");
-        var passTopic = $('#passTopicValue').val();
-        var passLevel = $('#passLevelValue').val();
+        $('#submitButton').click(function () {
+            var topic = $('#topic').val();
+            var level = $('#level').val();
+            var deadLine = $('#datepicker').datepicker("getDate");
+            var passTopic = $('#passTopic').val();
+            var passLevel = $('#passLevel').val();
 
-        // Отправляем данные в контроллер
-        $.post('/admin/deadlines', {
-            topic: topic,
-            level: level,
-            deadLine: deadLine,
-            passTopic: passTopic,
-            passLevel: passLevel
-        })
-            .done(function (data) {
-                // Обработка успешного выполнения запроса
-                // Например, отображение сообщения об успешном сохранении данных
+            $.post('/admin/deadlines/global', {
+                topic: topic,
+                level: level,
+                deadLine: deadLine,
+                passTopic: passTopic,
+                passLevel: passLevel
             })
-            .fail(function () {
-                // Обработка ошибки
-                // Например, отображение сообщения об ошибке
-            });
+                .done(function (data) {
+
+                })
+                .fail(function () {
+
+                });
+        });
+
+        $('#topic').change(function () {
+            var topicNumber = $(this).val();
+            $('#levelContainer').empty();
+            $('#datepicker, .topic-container, .level-container, #submitButton').hide();
+            if (topicNumber !== "") {
+                fetch('/admin/deadlines/levels?topicNumber=' + topicNumber)
+                    .then(response => response.json())
+                    .then(data => {
+                        var select = $('<select>').attr('name', 'level').attr('id', 'level');
+                        $('<option>').attr('value', '').text('Выберите уровень').appendTo(select);
+                        data.forEach(function (level) {
+                            $('<option>').attr('value', level.number).text('Level ' + level.number).appendTo(select);
+                        });
+                        $('#levelContainer').append(select).show();
+                        $('#datepicker, .topic-container, #submitButton').show();
+                        $('#level').change(function () {
+                            if ($(this).val() !== "") {
+                                $('.level-container').show();
+                            } else {
+                                $('.level-container').hide();
+                            }
+                        });
+                    });
+            }
+        });
+
+        $('#globalButton').click(function () {
+            window.location.href = '/admin/deadlines/global';
+        });
     });
 </script>
 
