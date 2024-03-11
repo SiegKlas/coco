@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Deadlines</title>
+    <link href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    <style>
+        .slider-container {
+            margin-top: 10px;
+        }
+
+        .slider-label {
+            margin-bottom: 5px;
+        }
+
+        .slider {
+            width: 200px;
+        }
+
+        #datepicker {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Deadlines</h2>
+
+<form action="#" id="deadlinesForm" method="post" th:action="@{/admin/deadlines}">
+
+    <div th:if="${topics}">
+        <select id="topic" name="topic">
+            <option value="">Выберите тему</option>
+            <option th:each="topic : ${topics}" th:text="${topic.name}" th:value="${topic.number}"></option>
+        </select>
+        <div id="levelContainer"></div>
+        <script th:inline="javascript">
+            document.getElementById('topic').addEventListener('change', function () {
+                var topicNumber = this.value;
+                document.getElementById('levelContainer').innerHTML = '';
+                fetch('/admin/deadlines/levels?topicNumber=' + topicNumber)
+                    .then(response => response.json())
+                    .then(data => {
+                        var select = document.createElement('select');
+                        select.name = 'level';
+                        select.id = 'level';
+                        data.forEach(function (level) {
+                            var option = document.createElement('option');
+                            option.value = level.number;
+                            option.text = 'Level ' + level.number;
+                            select.appendChild(option);
+                        });
+                        document.getElementById('levelContainer').appendChild(select);
+                    });
+            });
+        </script>
+        <div id="datepicker"></div>
+        <div class="slider-container">
+            <label class="slider-label" for="passTopic">Pass для темы:</label>
+            <input id="passTopic" name="passTopic" type="text">
+        </div>
+        <div class="slider-container">
+            <label class="slider-label" for="passLevel">Pass для уровня:</label>
+            <input id="passLevel" name="passLevel" type="text">
+        </div>
+        <button id="submitButton" type="button">Подтвердить</button>
+    </div>
+
+</form>
+
+<script th:inline="javascript">
+    // Добавляем слайдеры для выбора значения pass
+    $(function () {
+        $("#passTopic").slider({
+            range: "min",
+            value: 0,
+            min: 0,
+            max: 100,
+            slide: function (event, ui) {
+                $("#passTopicValue").val(ui.value);
+            }
+        });
+        $("#passLevel").slider({
+            range: "min",
+            value: 0,
+            min: 0,
+            max: 100,
+            slide: function (event, ui) {
+                $("#passLevelValue").val(ui.value);
+            }
+        });
+    });
+
+    // Устанавливаем календарь для выбора даты
+    $(function () {
+        $("#datepicker").datepicker();
+    });
+
+    // Обработчик нажатия кнопки "Подтвердить"
+    $('#submitButton').click(function () {
+        var topic = $('#topic').val();
+        var level = $('#level').val();
+        var deadLine = $('#datepicker').datepicker("getDate");
+        var passTopic = $('#passTopicValue').val();
+        var passLevel = $('#passLevelValue').val();
+
+        // Отправляем данные в контроллер
+        $.post('/admin/deadlines', {
+            topic: topic,
+            level: level,
+            deadLine: deadLine,
+            passTopic: passTopic,
+            passLevel: passLevel
+        })
+            .done(function (data) {
+                // Обработка успешного выполнения запроса
+                // Например, отображение сообщения об успешном сохранении данных
+            })
+            .fail(function () {
+                // Обработка ошибки
+                // Например, отображение сообщения об ошибке
+            });
+    });
+</script>
+
+</body>
+</html>
