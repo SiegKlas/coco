@@ -22,9 +22,7 @@ import ru.michael.coco.user.UserDTO;
 import ru.michael.coco.user.UserMapper;
 import ru.michael.coco.user.UserService;
 
-import java.util.Date;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 @Controller
 @RequestMapping("/admin/deadlines")
@@ -123,5 +121,29 @@ public class AdminDeadlinesController {
         } catch (NoSuchElementException e) {
             return ResponseEntity.badRequest().body("No such topic or level");
         }
+    }
+
+    @GetMapping("/globalDeadline")
+    @ResponseBody
+    public Map<String, Object> globalDeadline(@RequestParam("topic") Integer topicNumber,
+                                              @RequestParam("level") Integer levelNumber) {
+        TopicDescription topicDescription = topicDescriptionService.findTopicDescriptionByNumber(topicNumber).orElseThrow();
+        Optional<LevelDescription> levelDescriptionOptional = levelDescriptionService.findLevelDescriptionByNumber(levelNumber);
+        Date topicDeadline = topicDescription.getDeadLine();
+        Integer topicPass = topicDescription.getPass();
+        Map<String, Object> response = new HashMap<>();
+        if (topicDeadline != null) {
+            response.put("topicDeadline", topicDeadline);
+        }
+        if (topicPass != null) {
+            response.put("topicPass", topicPass);
+        }
+        if (levelDescriptionOptional.isPresent()) {
+            Integer levelPass = levelDescriptionOptional.get().getPass();
+            if (levelPass != null) {
+                response.put("levelPass", levelPass);
+            }
+        }
+        return response;
     }
 }

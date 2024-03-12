@@ -5,9 +5,11 @@ import org.springframework.stereotype.Service;
 import ru.michael.coco.attempt.AttemptService;
 import ru.michael.coco.level.Level;
 import ru.michael.coco.level.LevelService;
+import ru.michael.coco.level_description.LevelDescription;
 import ru.michael.coco.task_description.TaskDescription;
 import ru.michael.coco.topic.Topic;
 import ru.michael.coco.topic.TopicService;
+import ru.michael.coco.topic_description.TopicDescription;
 import ru.michael.coco.user.User;
 
 import java.util.List;
@@ -50,6 +52,14 @@ public class TaskService {
 
     public List<Task> findTasksByUser(User user) {
         return taskRepository.findTasksByUser(user);
+    }
+
+    public List<Task> findTasksByUserAndTopicDescriptionAndLevelDescription(
+            User user, TopicDescription topicDescription, LevelDescription levelDescription
+    ) {
+        return taskRepository.findTasksByUserAndTaskDescription_LevelDescription_TopicDescriptionAndTaskDescription_LevelDescriptionOrderByTaskDescription_Number(
+                user, topicDescription, levelDescription
+        );
     }
 
     public Task.STATUS getStatus(Task task) {

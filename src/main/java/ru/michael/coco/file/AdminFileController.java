@@ -1,13 +1,18 @@
 package ru.michael.coco.file;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import ru.michael.coco.admin.statistics.CsvWriter;
 import ru.michael.coco.task.Task;
 import ru.michael.coco.task.TaskRepository;
 import ru.michael.coco.task.TaskService;
@@ -17,6 +22,7 @@ import ru.michael.coco.task_description.TaskDescriptionService;
 import ru.michael.coco.user.User;
 import ru.michael.coco.user.UserRepository;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,17 +43,19 @@ public class AdminFileController {
     @Value("${file.xbank-dir}")
     private String xbankDir;
     private final TaskService taskService;
+    private final CsvWriter csvWriter;
 
     @Autowired
     public AdminFileController(FileService fileService, TaskDescriptionService taskDescriptionService,
                                UserRepository userRepository, TaskRepository taskRepository,
-                               TaskDescriptionRepository taskDescriptionRepository, TaskService taskService) {
+                               TaskDescriptionRepository taskDescriptionRepository, TaskService taskService, CsvWriter csvWriter) {
         this.fileService = fileService;
         this.taskDescriptionService = taskDescriptionService;
         this.userRepository = userRepository;
         this.taskRepository = taskRepository;
         this.taskDescriptionRepository = taskDescriptionRepository;
         this.taskService = taskService;
+        this.csvWriter = csvWriter;
     }
 
     @GetMapping("/upload")
@@ -107,5 +115,24 @@ public class AdminFileController {
         }));
 
         return "redirect:/admin/files";
+    }
+
+    @GetMapping("/downloadCsv")
+    public ResponseEntity<byte[]> downloadCsv() {
+        try {
+            var stats = csvWriter.collectStats();
+            CsvWriter.writeMapToCsv(stats);
+
+            byte[] content = FileUtils.readFileToByteArray(new File(CsvWriter.CSV_FILE_PATH));
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", "file.csv");
+            headers.setContentLength(content.length);
+
+            return new ResponseEntity<>(content, headers, HttpStatus.OK);
+        } catch (IOException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

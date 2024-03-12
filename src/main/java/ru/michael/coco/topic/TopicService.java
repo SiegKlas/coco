@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.michael.coco.topic_description.TopicDescription;
 import ru.michael.coco.user.User;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,5 +27,9 @@ public class TopicService {
 
     public void save(Topic topic) {
         topicRepository.save(topic);
+    }
+
+    public List<Topic> findAllByUser(User user) {
+        return topicRepository.findAllByUserOrderByTopicDescription_Number(user);
     }
 }

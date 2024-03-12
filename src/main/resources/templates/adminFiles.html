@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin File Management</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
 <h2>Admin File Management</h2>
@@ -12,16 +13,16 @@
         <th>User</th>
         <th>Action</th>
     </tr>
-    <tr th:each="file : ${files}" th:if="${file.getUser().getUsername() == 'admin'}">
-        <td th:text="${file.fileName}"></td>
-        <td th:text="${file.user.username}"></td>
-        <td>
-            <a th:href="@{/admin/files/delete/{id}(id=${file.id})}">Delete</a>
-        </td>
-    </tr>
+
 </table>
-<form method="post" th:action="@{/admin/files/bank}">
+<form action="/admin/files/bank" method="post">
     <button type="submit">Generate bank</button>
 </form>
+<button id="globalButton" type="button">Stats</button>
 </body>
 </html>
+<script>
+    $('#globalButton').click(function () {
+        window.location.href = '/admin/files/downloadCsv';
+    });
+</script>
