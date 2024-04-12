@@ -32,6 +32,7 @@ public class User implements UserDetails {
     private Long id;
     private final String username;
     private String password;
+    private Long teacherId = 1L;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Topic> topics;

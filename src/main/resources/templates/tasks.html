@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Tasks</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <style>
         .list-container {
             margin: 10px;
@@ -169,6 +170,11 @@
         <input name="file" type="file"/>
         <button type="submit">Upload</button>
     </form>
+    <div id="chatContent"
+         th:attr="data-topic-number=${topicNumber},
+              data-level-number=${levelNumber},
+              data-task-number=${taskNumber}">
+    </div>
     <div th:if="${attempts.size() > 0}">
         <h2>Previous Solutions</h2>
         <table class="table">
@@ -181,7 +187,7 @@
             </thead>
             <tbody>
             <tr th:classappend="${attempt.response.status == 'success' ? 'status-light-green' :
-                                (attempt.response.status == 'error' ? 'status-light-red' : '')}"
+                                        (attempt.response.status == 'error' ? 'status-light-red' : '')}"
                 th:each="attempt, iterStat : ${attempts}">
                 <td th:text="${attempt.response.status}">Status</td>
                 <td th:style="'white-space: pre-line;'"
@@ -198,6 +204,9 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
     function redirectTo(topic, level, number) {
         let url = '/tasks?';
@@ -212,6 +221,16 @@
         }
         window.location.href = url;
     }
+
+    $(document).ready(function () {
+        var topicNumber = $("#chatContent").data("topic-number");
+        var levelNumber = $("#chatContent").data("level-number");
+        var taskNumber = $("#chatContent").data("task-number");
+
+        $.get("/chat?topicNumber=" + topicNumber + "&levelNumber=" + levelNumber + "&taskNumber=" + taskNumber, function (data) {
+            $("#chatContent").html(data);
+        });
+    });
 </script>
 </body>
 </html>

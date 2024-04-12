@@ -39,7 +39,7 @@
             </select>
         </div>
         <select id="topic" name="topic" style="display: none;">
-            <option value="">Выберите тему</option>
+            <option value="">Select a topic</option>
             <option th:each="topic : ${topics}" th:text="${topic.name}" th:value="${topic.number}"></option>
         </select>
 
@@ -48,16 +48,16 @@
         <div id="datepicker" style="display: none;"></div>
 
         <div class="topic-container" style="display: none;">
-            <label class="slider-label" for="passTopic">Pass для темы:</label>
+            <label class="slider-label" for="passTopic">Topic pass:</label>
             <input id="passTopic" name="passTopic" type="text">
         </div>
 
         <div class="level-container" style="display: none;">
-            <label class="slider-label" for="passLevel">Pass для уровня:</label>
+            <label class="slider-label" for="passLevel">Level pass:</label>
             <input id="passLevel" name="passLevel" type="text">
         </div>
 
-        <button id="submitButton" style="display: none;" type="button">Подтвердить</button>
+        <button id="submitButton" style="display: none;" type="button">Confirm</button>
     </div>
 
 </form>
@@ -134,7 +134,7 @@
                     .then(response => response.json())
                     .then(data => {
                         var select = $('<select>').attr('name', 'level').attr('id', 'level');
-                        $('<option>').attr('value', '').text('Выберите уровень').appendTo(select);
+                        $('<option>').attr('value', '').text('Select a level').appendTo(select);
                         data.forEach(function (level) {
                             $('<option>').attr('value', level.number).text('Level ' + level.number).appendTo(select);
                         });

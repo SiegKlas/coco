@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content">
+    <div id="chat">
+        <div id="messages"></div>
+        <input id="messageInput" placeholder="Type your message..." type="text">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <script>
+        var stompClient = null;
+
+        function connect() {
+            var socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, function (frame) {
+                console.log('Connected: ' + frame);
+                stompClient.subscribe('/topic/public', function (chatMessage) {
+                    showMessage(JSON.parse(chatMessage.body));
+                });
+            });
+        }
+
+        function sendMessage() {
+            var messageInput = document.getElementById('messageInput');
+            var messageContent = messageInput.value.trim();
+            if (messageContent) {
+                stompClient.send("/app/chat.sendMessage", {}, JSON.stringify({
+                    'sender': 'student',
+                    'content': messageContent
+                }));
+                messageInput.value = '';
+            }
+        }
+
+        function showMessage(message) {
+            var messageElement = document.createElement('div');
+            messageElement.textContent = message.sender + ': ' + message.content;
+            document.getElementById('messages').appendChild(messageElement);
+        }
+
+        connect();
+    </script>
+</div>
+</body>
+</html>
