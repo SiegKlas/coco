@@ -85,7 +85,7 @@ public class DataLoaderConfig {
 
                     User user = new User(login);
                     user.setPassword(passwordEncoder.encode(password));
-                    user.setRole(User.Role.ADMIN);
+                    user.setRole(User.Role.TEACHER);
                     userService.save(user);
                 }
             }

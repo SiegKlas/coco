@@ -16,9 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class Chat {
-
-    @OneToOne
-    private final User student;
+    @ManyToMany
+    private final List<User> chatters;
     @OneToOne
     private final Task task;
     @OneToMany(cascade = CascadeType.ALL)

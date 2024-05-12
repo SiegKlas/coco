@@ -2,50 +2,82 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="content">
-    <div id="chat">
-        <div id="messages"></div>
-        <input id="messageInput" placeholder="Type your message..." type="text">
-        <button onclick="sendMessage()">Send</button>
+    <div id="chat-page">
+        <div id="chat-window">
+            <div id="messages" style="height:300px; overflow-y:scroll; border: 1px solid #ccc;">
+            </div>
+            <input id="messageInput" placeholder="Type your message..." type="text">
+            <button id="sendButton">Send</button>
+        </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-
-    <script>
+    <script th:inline="javascript" type="text/javascript">
+        /*<![CDATA[*/
         var stompClient = null;
+        var chatId = [[${chatId}]];
+        var username = [[${username}]];
 
         function connect() {
             var socket = new SockJS('/ws');
             stompClient = Stomp.over(socket);
             stompClient.connect({}, function (frame) {
                 console.log('Connected: ' + frame);
-                stompClient.subscribe('/topic/public', function (chatMessage) {
-                    showMessage(JSON.parse(chatMessage.body));
+                stompClient.subscribe('/topic/publicChatRoom/' + chatId, function (message) {
+                    console.log('Received message from server: ', message.body);
+                    showMessage(JSON.parse(message.body));
                 });
+            }, function (error) {
+                console.log('Error in connection: ', error);
             });
         }
 
         function sendMessage() {
-            var messageInput = document.getElementById('messageInput');
-            var messageContent = messageInput.value.trim();
-            if (messageContent) {
-                stompClient.send("/app/chat.sendMessage", {}, JSON.stringify({
-                    'sender': 'student',
-                    'content': messageContent
-                }));
-                messageInput.value = '';
+            if (typeof stompClient !== 'undefined' && stompClient.connected) {
+                var messageToSend = {
+                    username: username,
+                    content: $("#messageInput").val(),
+                    chatId: chatId.toString()
+                };
+                console.log('Sending message: ', messageToSend);
+                stompClient.send("/app/chat.sendMessage", {}, JSON.stringify(messageToSend));
+                $('#messageInput').val("");
+            } else {
+                console.log("WebSocket connection is not established.");
             }
         }
 
         function showMessage(message) {
+            console.log('Show message: ', message);
             var messageElement = document.createElement('div');
-            messageElement.textContent = message.sender + ': ' + message.content;
-            document.getElementById('messages').appendChild(messageElement);
+            messageElement.innerHTML = "<strong>" + message.username + ":</strong> " + message.content;
+            document.getElementById("messages").appendChild(messageElement);
+            console.log('Message added to the DOM');
         }
 
-        connect();
+        function loadHistory(chatId) {
+            $.get("/chat/history/" + chatId, function (messages) {
+                console.log('History loaded: ', messages);
+                messages.forEach(function (message) {
+                    showMessage(message);
+                });
+            }).fail(function (error) {
+                console.error("Error loading history: ", error);
+            });
+        }
+
+        $(document).ready(function () {
+            connect();
+            loadHistory(chatId);
+            $("#sendButton").click(function () {
+                sendMessage();
+            });
+        });
+        /*]]>*/
     </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </div>
 </body>
 </html>

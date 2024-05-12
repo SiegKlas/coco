@@ -12,11 +12,10 @@ import ru.michael.coco.user.User;
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class ChatMessage {
-
     @ManyToOne
-    private final User sender;
+    private User sender;
     @ManyToOne
-    private final Chat chat;
+    private Chat chat;
     private final String content;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

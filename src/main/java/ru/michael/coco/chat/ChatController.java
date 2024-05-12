@@ -1,7 +1,6 @@
 package ru.michael.coco.chat;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -14,6 +13,9 @@ import ru.michael.coco.task_description.TaskDescriptionService;
 import ru.michael.coco.user.User;
 import ru.michael.coco.user.UserService;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Controller
 @RequestMapping("/chat")
 public class ChatController {
@@ -22,13 +24,15 @@ public class ChatController {
     private final UserService userService;
     private final TaskService taskService;
     private final TaskDescriptionService taskDescriptionService;
+    private final ChatMessageMapper chatMessageMapper;
 
     @Autowired
-    public ChatController(ChatService chatService, UserService userService, TaskService taskService, TaskDescriptionService taskDescriptionService) {
+    public ChatController(ChatService chatService, UserService userService, TaskService taskService, TaskDescriptionService taskDescriptionService, ChatMessageMapper chatMessageMapper) {
         this.chatService = chatService;
         this.userService = userService;
         this.taskService = taskService;
         this.taskDescriptionService = taskDescriptionService;
+        this.chatMessageMapper = chatMessageMapper;
     }
 
     @GetMapping
@@ -38,25 +42,26 @@ public class ChatController {
                               Model model,
                               @AuthenticationPrincipal UserDetails userDetails) {
         User student = userService.findByUsername(userDetails.getUsername()).orElseThrow();
-        Chat chat = chatService.getChatByStudent(student);
+        TaskDescription taskDescription = taskDescriptionService
+                .findTaskDescriptionByTopicNumberAndLevelNumberAndTaskNumber(
+                        topicNumber, levelNumber, taskNumber
+                ).orElseThrow();
+        Task task = taskService.findTaskByUserAndTaskDescription(student, taskDescription).orElseThrow();
+        Chat chat = chatService.getChatByTask(task);
         if (chat == null) {
-            TaskDescription taskDescription = taskDescriptionService
-                    .findTaskDescriptionByTopicNumberAndLevelNumberAndTaskNumber(
-                            topicNumber, levelNumber, taskNumber
-                    ).orElseThrow();
-            Task task = taskService.findTaskByUserAndTaskDescription(student, taskDescription).orElseThrow();
             chat = chatService.createChat(student, task);
         }
         model.addAttribute("chatId", chat.getId());
+        model.addAttribute("username", userDetails.getUsername());
         return "chat";
     }
 
-    @PostMapping("/sendMessage")
+    @GetMapping("/history/{chatId}")
     @ResponseBody
-    public ResponseEntity<?> sendMessage(@RequestBody ChatMessageDto messageDto,
-                                         @AuthenticationPrincipal UserDetails userDetails) {
-        // Логика для отправки сообщения в чат
-        return ResponseEntity.ok().build();
+    public List<ChatMessageDto> history(@PathVariable Long chatId) {
+        Chat chat = chatService.getChatById(chatId).orElseThrow();
+        return chat.getMessages().stream()
+                .map(chatMessageMapper::chatMessageToDto)
+                .collect(Collectors.toList());
     }
 }
-

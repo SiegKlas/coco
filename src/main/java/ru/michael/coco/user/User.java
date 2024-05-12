@@ -32,7 +32,12 @@ public class User implements UserDetails {
     private Long id;
     private final String username;
     private String password;
-    private Long teacherId = 1L;
+
+    @ManyToOne
+    private User teacher;
+
+    @OneToMany(mappedBy = "teacher")
+    private List<User> students;
 
     @OneToMany(cascade = CascadeType.ALL)
     private List<Topic> topics;
@@ -42,7 +47,7 @@ public class User implements UserDetails {
     private List<Task> tasks;
 
     public enum Role {
-        USER, ADMIN
+        STUDENT, TEACHER
     }
 
     @Override
