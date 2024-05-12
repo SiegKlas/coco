@@ -1,4 +1,16 @@
 spring:
+  mail:
+    host: smtp.yandex.ru
+    port: 587
+    username: pluginmichael@yandex.ru
+    password: qlmtwazzyhkhpedk
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
   servlet:
     multipart:
       max-file-size: 100MB
