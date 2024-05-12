@@ -60,4 +60,9 @@ public class ChatService {
         chatMessageRepository.save(chatMessage);
         chatRepository.save(chat);
     }
+
+    public List<Chat> getAllChatsWithUnreadMessages(User user) {
+        var chats = getAllChats();
+        return chats.stream().filter(chat -> chat.getChatters().contains(user)).filter(chat -> !chat.getMessages().isEmpty()).toList();
+    }
 }

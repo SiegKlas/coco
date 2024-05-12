@@ -16,9 +16,9 @@
         </thead>
         <tbody>
         <tr th:each="chat : ${chats}">
-            <td th:text="${chat.chatters[0].username}">Student Name</td>
+            <td th:text="${chat.chatters[1].username}">Student Name</td>
             <td>
-                <a th:href="@{/admin/tasks(user=${chat.chatters[0].username}, topic=${chat.task.taskDescription.levelDescription.topicDescription.number}, level=${chat.task.taskDescription.levelDescription.number}, task=${chat.task.taskDescription.number})}"
+                <a th:href="@{/admin/tasks(user=${chat.chatters[1].username}, topic=${chat.task.taskDescription.levelDescription.topicDescription.number}, level=${chat.task.taskDescription.levelDescription.number}, task=${chat.task.taskDescription.number})}"
                    th:text="'Go to Chat'">Chat Link</a>
             </td>
         </tr>

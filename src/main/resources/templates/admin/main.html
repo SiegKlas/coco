@@ -1,18 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Admin Panel</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<h1>Admin Dashboard</h1>
-<div>
-    <h2>Active Chats</h2>
-    <ul>
-        <li th:each="chat : ${chats}">
-            <a th:href="@{/admin/notifications}" th:text="'Chat with ' + ${chat.id}">Chat Link</a>
-        </li>
-    </ul>
+<div class="container mt-3">
+    <h1>Admin Dashboard</h1>
+    <div>
+        <a class="btn btn-primary mt-2" href="/admin/notifications">Go to Notifications</a>
+    </div>
 </div>
 </body>
 </html>

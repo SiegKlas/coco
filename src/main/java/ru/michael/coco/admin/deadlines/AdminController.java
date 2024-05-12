@@ -7,8 +7,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.michael.coco.chat.Chat;
 import ru.michael.coco.chat.ChatService;
+import ru.michael.coco.task.Task;
+import ru.michael.coco.task.TaskService;
+import ru.michael.coco.task_description.TaskDescription;
+import ru.michael.coco.task_description.TaskDescriptionMapper;
+import ru.michael.coco.task_description.TaskDescriptionService;
 import ru.michael.coco.user.User;
 import ru.michael.coco.user.UserService;
 
@@ -17,12 +23,20 @@ import java.util.List;
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
+    private final ChatService chatService;
+    private final UserService userService;
+    private final TaskDescriptionService taskDescriptionService;
+    private final TaskService taskService;
+    private final TaskDescriptionMapper taskDescriptionMapper;
 
     @Autowired
-    private ChatService chatService;
-
-    @Autowired
-    private UserService userService;
+    public AdminController(ChatService chatService, UserService userService, TaskDescriptionService taskDescriptionService, TaskService taskService, TaskDescriptionMapper taskDescriptionMapper) {
+        this.chatService = chatService;
+        this.userService = userService;
+        this.taskDescriptionService = taskDescriptionService;
+        this.taskService = taskService;
+        this.taskDescriptionMapper = taskDescriptionMapper;
+    }
 
     // Отображение главной страницы администратора с обзором всех чатов
     @GetMapping
@@ -39,5 +53,35 @@ public class AdminController {
         List<Chat> chats = chatService.getAllChatsWithUnreadMessages(admin);
         model.addAttribute("chats", chats);
         return "admin/notifications";
+    }
+
+    @GetMapping("/tasks")
+    public String getAdminTaskPage(@RequestParam("user") String username,
+                                   @RequestParam("topic") Integer topicNumber,
+                                   @RequestParam("level") Integer levelNumber,
+                                   @RequestParam("task") Integer taskNumber,
+                                   Model model) {
+        User student = userService.findByUsername(username).orElseThrow();
+        TaskDescription taskDescription = taskDescriptionService
+                .findTaskDescriptionByTopicNumberAndLevelNumberAndTaskNumber(topicNumber, levelNumber, taskNumber)
+                .orElseThrow();
+        Task task = taskService.findTaskByUserAndTaskDescription(student, taskDescription).orElseThrow();
+
+        model.addAttribute("topicNumber", topicNumber);
+        model.addAttribute("levelNumber", levelNumber);
+        model.addAttribute("taskNumber", taskNumber);
+        model.addAttribute("taskDescriptionDTO", taskDescriptionMapper.toDTO(taskDescription));
+        model.addAttribute("dir_name", taskDescription.getFileName());
+
+        model.addAttribute("attempts", task.getAttempts());
+        model.addAttribute("status", taskService.getStatus(task));
+
+        Chat chat = chatService.getChatByTask(task);
+        if (chat == null) {
+            chat = chatService.createChat(student, task);
+        }
+        model.addAttribute("chatId", chat.getId());
+
+        return "admin/task";
     }
 }

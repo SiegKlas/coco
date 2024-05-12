@@ -88,6 +88,9 @@ public class DataLoaderConfig {
                     user.setRole(User.Role.TEACHER);
                     userService.save(user);
                 }
+                User student = userService.findByUsername("user").orElseThrow();
+                student.setTeacher(userService.findByUsername("admin").orElseThrow());
+                userService.save(student);
             }
         };
     }
