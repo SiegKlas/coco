@@ -30,5 +30,6 @@ spring:
 file:
   upload-dir: D:\diploma\robot\exfiles
   xbank-dir: D:\diploma\robot\xbank
+  groups-dir: D:\diploma\robot\groups
   creds: D:\diploma\coco\users\creds.csv
   solutions: D:\diploma\coco\solutions

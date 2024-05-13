@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Group</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-3">
+    <h1>Edit Group</h1>
+    <form method="post" th:action="@{/overseer/updateGroup}">
+        <input name="groupId" th:value="${group.id}" type="hidden">
+        <div class="form-group">
+            <label for="groupName">Group Name</label>
+            <input class="form-control" id="groupName" name="groupName" required th:value="${group.name}" type="text">
+        </div>
+        <div class="form-group">
+            <label for="teacher">Select Teacher</label>
+            <select class="form-control" id="teacher" name="teacherId" required>
+                <option th:each="teacher : ${allTeachers}"
+                        th:selected="${teacher.id == group.teacher.id}"
+                        th:text="${teacher.username}"
+                        th:value="${teacher.id}">Teacher
+                </option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="students">Select Students</label>
+            <select class="form-control" id="students" multiple name="studentIds" required>
+                <option th:each="student : ${allStudents}"
+                        th:selected="${group.students.contains(student)}"
+                        th:text="${student.username}"
+                        th:value="${student.id}">Student
+                </option>
+            </select>
+        </div>
+        <button class="btn btn-success" type="submit">Update Group</button>
+    </form>
+</div>
+</body>
+</html>
