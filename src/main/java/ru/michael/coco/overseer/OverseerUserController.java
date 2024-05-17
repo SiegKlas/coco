@@ -56,18 +56,14 @@ public class OverseerUserController {
         User user = userMapper.toEntity(userDTO);
         user.setPassword(new BCryptPasswordEncoder().encode(userDTO.getPassword()));
 
+        userService.save(user);
+
         if (userDTO.getGroupIds() != null && !userDTO.getGroupIds().isEmpty()) {
             List<Group> groups = userDTO.getGroupIds().stream()
                     .map(groupId -> groupService.findById(groupId).orElseThrow(() -> new RuntimeException("Group not found")))
-                    .collect(Collectors.toList());
-            user.setGroups(groups);
-        }
+                    .toList();
 
-        userService.save(user);
-
-        if (user.getGroups() != null && !user.getGroups().isEmpty()) {
-            List<Group> groupsToUpdate = new ArrayList<>(user.getGroups());
-            for (Group group : groupsToUpdate) {
+            for (Group group : groups) {
                 groupAssignmentService.addUserToGroup(user, group);
             }
         }
@@ -76,22 +72,38 @@ public class OverseerUserController {
     }
 
     @PostMapping("/update")
+    @Transactional
     public String updateUser(@ModelAttribute UserDTO userDTO) {
         User user = userService.findById(userDTO.getId()).orElseThrow(() -> new RuntimeException("User not found"));
         user.setUsername(userDTO.getUsername());
         user.setRole(userDTO.getRole());
         user.setEmail(userDTO.getEmail());
-        if (!userDTO.getPassword().isEmpty()) {
+
+        if (userDTO.getPassword() != null && !userDTO.getPassword().isEmpty()) {
             user.setPassword(new BCryptPasswordEncoder().encode(userDTO.getPassword()));
         }
 
-        if (userDTO.getGroupIds() != null) {
-            List<Group> groups = userDTO.getGroupIds().stream()
+        // Удаление пользователя из текущих групп
+        for (Group group : new ArrayList<>(user.getGroups())) {
+            groupAssignmentService.removeUserFromGroup(user, group);
+        }
+
+        // Удаление пользователя из группы как учителя, если он был учителем
+        for (Group group : groupService.findAllGroups()) {
+            if (group.getTeacher() != null && group.getTeacher().getId().equals(user.getId())) {
+                group.setTeacher(null);
+                groupService.saveGroup(group);
+            }
+        }
+
+        if (userDTO.getGroupIds() != null && !userDTO.getGroupIds().isEmpty()) {
+            List<Group> newGroups = userDTO.getGroupIds().stream()
                     .map(groupId -> groupService.findById(groupId).orElseThrow(() -> new RuntimeException("Group not found")))
-                    .collect(Collectors.toList());
-            user.setGroups(groups);
-        } else {
-            user.getGroups().clear();
+                    .toList();
+
+            for (Group group : newGroups) {
+                groupAssignmentService.addUserToGroup(user, group);
+            }
         }
 
         userService.save(user);

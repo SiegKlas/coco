@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import ru.michael.coco.group.Group;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,10 +25,10 @@ public interface UserMapper {
 
     @Named("mapIdsToGroups")
     default List<Group> mapIdsToGroups(List<Long> ids) {
-        return ids.stream().map(id -> {
+        return ids != null ? ids.stream().map(id -> {
             Group group = new Group();
             group.setId(id);
             return group;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList()) : new ArrayList<>();
     }
 }

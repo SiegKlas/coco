@@ -20,19 +20,7 @@ public class GroupAssignmentService {
     }
 
     @Transactional
-    public void addUserToGroup(User user, String groupName) {
-        Group group = groupService.findByName(groupName)
-                .orElseGet(() -> {
-                    Group newGroup = new Group();
-                    newGroup.setName(groupName);
-                    groupService.saveGroup(newGroup);
-                    return newGroup;
-                });
-
-        setGroupByUserRole(user, group);
-    }
-
-    private void setGroupByUserRole(User user, Group group) {
+    public void addUserToGroup(User user, Group group) {
         if (user.getRole() == User.Role.TEACHER) {
             group.setTeacher(user);
         } else if (user.getRole() == User.Role.STUDENT) {
@@ -48,7 +36,16 @@ public class GroupAssignmentService {
     }
 
     @Transactional
-    public void addUserToGroup(User user, Group group) {
-        setGroupByUserRole(user, group);
+    public void removeUserFromGroup(User user, Group group) {
+        if (user.getRole() == User.Role.TEACHER && group.getTeacher() != null && group.getTeacher().equals(user)) {
+            group.setTeacher(null);
+        } else if (user.getRole() == User.Role.STUDENT) {
+            group.getStudents().remove(user);
+        }
+
+        user.getGroups().remove(group);
+
+        groupService.saveGroup(group);
+        userService.save(user);
     }
 }

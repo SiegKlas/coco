@@ -6,6 +6,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.michael.coco.group.Group;
 import ru.michael.coco.group.GroupService;
 import ru.michael.coco.task.TaskService;
 import ru.michael.coco.task_description.TaskDescriptionService;
@@ -69,7 +70,24 @@ public class DataLoaderConfig {
                     userService.save(user); // Сохранение пользователя до добавления группы
 
                     if (!groupName.equals("null") && !groupName.isEmpty()) {
-                        groupAssignmentService.addUserToGroup(user, groupName);
+                        Group group = groupService.findByName(groupName)
+                                .orElseGet(() -> {
+                                    Group newGroup = new Group();
+                                    newGroup.setName(groupName);
+                                    groupService.saveGroup(newGroup);
+                                    return newGroup;
+                                });
+
+                        if (user.getRole() == User.Role.TEACHER) {
+                            group.setTeacher(user);
+                        } else if (user.getRole() == User.Role.STUDENT) {
+                            group.getStudents().add(user);
+                        }
+
+                        user.getGroups().add(group);
+
+                        groupService.saveGroup(group);
+                        userService.save(user);
                     }
                 }
             } catch (IOException e) {
