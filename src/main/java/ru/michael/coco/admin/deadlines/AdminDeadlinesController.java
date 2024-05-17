@@ -5,6 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.michael.coco.group.Group;
+import ru.michael.coco.group.GroupService;
 import ru.michael.coco.level.Level;
 import ru.michael.coco.level.LevelService;
 import ru.michael.coco.level_description.LevelDescription;
@@ -32,17 +34,19 @@ public class AdminDeadlinesController {
     private final LevelDescriptionService levelDescriptionService;
     private final TopicService topicService;
     private final LevelService levelService;
+    private final GroupService groupService;
     private final UserMapper userMapper;
     private final TopicDescriptionMapper topicDescriptionMapper;
     private final LevelDescriptionMapper levelDescriptionMapper;
 
     @Autowired
-    public AdminDeadlinesController(UserService userService, TopicDescriptionService topicDescriptionService, LevelDescriptionService levelDescriptionService, TopicService topicService, LevelService levelService, UserMapper userMapper, TopicDescriptionMapper topicDescriptionMapper, LevelDescriptionMapper levelDescriptionMapper) {
+    public AdminDeadlinesController(UserService userService, TopicDescriptionService topicDescriptionService, LevelDescriptionService levelDescriptionService, TopicService topicService, LevelService levelService, GroupService groupService, UserMapper userMapper, TopicDescriptionMapper topicDescriptionMapper, LevelDescriptionMapper levelDescriptionMapper) {
         this.userService = userService;
         this.topicDescriptionService = topicDescriptionService;
         this.levelDescriptionService = levelDescriptionService;
         this.topicService = topicService;
         this.levelService = levelService;
+        this.groupService = groupService;
         this.userMapper = userMapper;
         this.topicDescriptionMapper = topicDescriptionMapper;
         this.levelDescriptionMapper = levelDescriptionMapper;
@@ -80,14 +84,15 @@ public class AdminDeadlinesController {
     }
 
     @PostMapping("/global")
-    public ResponseEntity<String> processGlobalDeadlines(@RequestParam("topic") Integer topicNumber,
+    public ResponseEntity<String> processGlobalDeadlines(@RequestParam("group") String groupName,
+                                                         @RequestParam("topic") Integer topicNumber,
                                                          @RequestParam("level") Integer levelNumber,
                                                          @RequestParam("deadLine") Date deadLine,
                                                          @RequestParam("passTopic") Integer passTopic,
                                                          @RequestParam("passLevel") Integer passLevel) {
         try {
-            LevelDescription levelDescription =
-                    levelDescriptionService.findLevelDescriptionByTopicDescriptionNumberAndNumber(topicNumber, levelNumber).orElseThrow();
+            Group group = groupService.findByName(groupName).orElseThrow();
+            LevelDescription levelDescription = levelDescriptionService.findLevelDescriptionByTopicDescriptionNumberAndNumber(topicNumber, levelNumber).orElseThrow();
             levelDescription.setPass(passLevel);
             levelDescription.getTopicDescription().setPass(passTopic);
             levelDescription.getTopicDescription().setDeadLine(deadLine);
@@ -99,16 +104,17 @@ public class AdminDeadlinesController {
     }
 
     @PostMapping("/students")
-    public ResponseEntity<String> processStudentDeadlines(@RequestParam("topic") Integer topicNumber,
+    public ResponseEntity<String> processStudentDeadlines(@RequestParam("group") String groupName,
+                                                          @RequestParam("topic") Integer topicNumber,
                                                           @RequestParam("level") Integer levelNumber,
                                                           @RequestParam("deadLine") Date deadLine,
                                                           @RequestParam("passTopic") Integer passTopic,
                                                           @RequestParam("passLevel") Integer passLevel,
                                                           @RequestParam("user") String userName) {
         try {
+            Group group = groupService.findByName(groupName).orElseThrow();
             User user = userService.findByUsername(userName).orElseThrow();
-            LevelDescription levelDescription =
-                    levelDescriptionService.findLevelDescriptionByTopicDescriptionNumberAndNumber(topicNumber, levelNumber).orElseThrow();
+            LevelDescription levelDescription = levelDescriptionService.findLevelDescriptionByTopicDescriptionNumberAndNumber(topicNumber, levelNumber).orElseThrow();
             TopicDescription topicDescription = levelDescription.getTopicDescription();
             Level level = levelService.findLevelByUserAndLevelDescription(user, levelDescription).orElseThrow();
             Topic topic = topicService.findTopicByUserAndTopicDescription(user, topicDescription).orElseThrow();
@@ -125,8 +131,10 @@ public class AdminDeadlinesController {
 
     @GetMapping("/globalDeadline")
     @ResponseBody
-    public Map<String, Object> globalDeadline(@RequestParam("topic") Integer topicNumber,
+    public Map<String, Object> globalDeadline(@RequestParam("group") String groupName,
+                                              @RequestParam("topic") Integer topicNumber,
                                               @RequestParam("level") Integer levelNumber) {
+        Group group = groupService.findByName(groupName).orElseThrow();
         TopicDescription topicDescription = topicDescriptionService.findTopicDescriptionByNumber(topicNumber).orElseThrow();
         Optional<LevelDescription> levelDescriptionOptional = levelDescriptionService.findLevelDescriptionByNumber(levelNumber);
         Date topicDeadline = topicDescription.getDeadLine();

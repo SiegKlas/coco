@@ -1,12 +1,14 @@
-package ru.michael.coco.overseer;
+package ru.michael.coco.bank;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import ru.michael.coco.task_description.TaskDescription;
+import ru.michael.coco.group.Group;
+import ru.michael.coco.topic_description.TopicDescription;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -14,12 +16,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED, force = true)
 public class Bank {
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "group_id")
     private final Group group;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    @OneToMany
-    private List<TaskDescription> taskDescriptions;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TopicDescription> topicDescriptions = new ArrayList<>();
 }

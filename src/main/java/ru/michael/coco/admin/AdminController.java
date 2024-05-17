@@ -1,4 +1,4 @@
-package ru.michael.coco.admin.deadlines;
+package ru.michael.coco.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.michael.coco.chat.Chat;
 import ru.michael.coco.chat.ChatService;
+import ru.michael.coco.group.Group;
+import ru.michael.coco.group.GroupService;
 import ru.michael.coco.task.Task;
 import ru.michael.coco.task.TaskService;
 import ru.michael.coco.task_description.TaskDescription;
@@ -28,14 +30,16 @@ public class AdminController {
     private final TaskDescriptionService taskDescriptionService;
     private final TaskService taskService;
     private final TaskDescriptionMapper taskDescriptionMapper;
+    private final GroupService groupService;
 
     @Autowired
-    public AdminController(ChatService chatService, UserService userService, TaskDescriptionService taskDescriptionService, TaskService taskService, TaskDescriptionMapper taskDescriptionMapper) {
+    public AdminController(ChatService chatService, UserService userService, TaskDescriptionService taskDescriptionService, TaskService taskService, TaskDescriptionMapper taskDescriptionMapper, GroupService groupService) {
         this.chatService = chatService;
         this.userService = userService;
         this.taskDescriptionService = taskDescriptionService;
         this.taskService = taskService;
         this.taskDescriptionMapper = taskDescriptionMapper;
+        this.groupService = groupService;
     }
 
     // Отображение главной страницы администратора с обзором всех чатов
@@ -57,11 +61,13 @@ public class AdminController {
 
     @GetMapping("/tasks")
     public String getAdminTaskPage(@RequestParam("user") String username,
+                                   @RequestParam("group") String groupName,
                                    @RequestParam("topic") Integer topicNumber,
                                    @RequestParam("level") Integer levelNumber,
                                    @RequestParam("task") Integer taskNumber,
                                    Model model) {
         User student = userService.findByUsername(username).orElseThrow();
+        Group group = groupService.findByName(groupName).orElseThrow();
         TaskDescription taskDescription = taskDescriptionService
                 .findTaskDescriptionByTopicNumberAndLevelNumberAndTaskNumber(topicNumber, levelNumber, taskNumber)
                 .orElseThrow();
@@ -85,3 +91,4 @@ public class AdminController {
         return "admin/task";
     }
 }
+

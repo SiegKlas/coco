@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import ru.michael.coco.group.Group;
 import ru.michael.coco.level.Level;
-import ru.michael.coco.overseer.Group;
 import ru.michael.coco.task.Task;
 import ru.michael.coco.topic.Topic;
 
@@ -31,8 +31,9 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-    private final String username;
+    private String username;
     private String password;
+    private String email;
 
     @ManyToMany(mappedBy = "students")
     private List<Group> groups;

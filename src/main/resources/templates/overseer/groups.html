@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Group Management</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-3">
+    <h1>Group Management</h1>
+    <button class="btn btn-success" onclick="showCreateGroupModal()">Create Group</button>
+    <table class="table mt-3">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Teacher</th>
+            <th>Students</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="group : ${groups}">
+            <td th:text="${group.id}"></td>
+            <td th:text="${group.name}"></td>
+            <td th:text="${group.teacherId != null ? group.teacherId : 'N/A'}"></td>
+            <td>
+                <ul>
+                    <li th:each="studentId : ${group.studentIds}" th:text="${studentId}"></li>
+                </ul>
+            </td>
+            <td>
+                <button class="btn btn-primary" onclick="showEditGroupModal([[${group}]])">Edit</button>
+                <button class="btn btn-danger" onclick="deleteGroup([[${group.id}]])">Delete</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Create/Edit Group Modal -->
+<div class="modal" id="groupModal" role="dialog" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="groupForm" method="post" th:action="@{/overseer/groups/create}">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create/Edit Group</h5>
+                    <button aria-label="Close" class="close" data-dismiss="modal" type="button">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input id="groupId" name="id" type="hidden">
+                    <div class="form-group">
+                        <label for="name">Group Name</label>
+                        <input class="form-control" id="name" name="name" required type="text">
+                    </div>
+                    <div class="form-group">
+                        <label for="teacher">Select Teacher</label>
+                        <select class="form-control" id="teacher" name="teacherId">
+                            <option th:each="teacher : ${teachers}" th:text="${teacher.username}"
+                                    th:value="${teacher.id}"></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="students">Select Students</label>
+                        <select class="form-control" id="students" multiple name="studentIds">
+                            <option th:each="student : ${students}" th:text="${student.username}"
+                                    th:value="${student.id}"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" type="submit">Save</button>
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showCreateGroupModal() {
+        document.getElementById('groupForm').reset();
+        document.getElementById('groupId').value = '';
+        document.getElementById('groupForm').action = '/overseer/groups/create';
+        $('#groupModal').modal('show');
+    }
+
+    function showEditGroupModal(group) {
+        document.getElementById('groupId').value = group.id;
+        document.getElementById('name').value = group.name;
+        document.getElementById('teacher').value = group.teacherId != null ? group.teacherId : '';
+        let studentsSelect = document.getElementById('students');
+        Array.from(studentsSelect.options).forEach(option => {
+            option.selected = group.studentIds.includes(parseInt(option.value));
+        });
+        document.getElementById('groupForm').action = '/overseer/groups/update';
+        $('#groupModal').modal('show');
+    }
+
+    function deleteGroup(groupId) {
+        if (confirm('Are you sure you want to delete this group?')) {
+            $.post('/overseer/groups/delete', {groupId: groupId})
+                .done(function () {
+                    location.reload();
+                });
+        }
+    }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
