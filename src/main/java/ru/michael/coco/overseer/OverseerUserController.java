@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import ru.michael.coco.configs.GroupAssignmentService;
 import ru.michael.coco.group.Group;
 import ru.michael.coco.group.GroupDTO;
 import ru.michael.coco.group.GroupMapper;
@@ -15,6 +17,7 @@ import ru.michael.coco.user.UserDTO;
 import ru.michael.coco.user.UserMapper;
 import ru.michael.coco.user.UserService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,13 +28,15 @@ public class OverseerUserController {
     private final GroupService groupService;
     private final UserMapper userMapper;
     private final GroupMapper groupMapper;
+    private final GroupAssignmentService groupAssignmentService;
 
     @Autowired
-    public OverseerUserController(UserService userService, GroupService groupService, UserMapper userMapper, GroupMapper groupMapper) {
+    public OverseerUserController(UserService userService, GroupService groupService, UserMapper userMapper, GroupMapper groupMapper, GroupAssignmentService groupAssignmentService) {
         this.userService = userService;
         this.groupService = groupService;
         this.userMapper = userMapper;
         this.groupMapper = groupMapper;
+        this.groupAssignmentService = groupAssignmentService;
     }
 
     @GetMapping
@@ -46,6 +51,7 @@ public class OverseerUserController {
     }
 
     @PostMapping("/create")
+    @Transactional
     public String createUser(@ModelAttribute UserDTO userDTO) {
         User user = userMapper.toEntity(userDTO);
         user.setPassword(new BCryptPasswordEncoder().encode(userDTO.getPassword()));
@@ -59,11 +65,10 @@ public class OverseerUserController {
 
         userService.save(user);
 
-        // Сохранение пользователя в группы
         if (user.getGroups() != null && !user.getGroups().isEmpty()) {
-            for (Group group : user.getGroups()) {
-                group.getStudents().add(user);
-                groupService.saveGroup(group);
+            List<Group> groupsToUpdate = new ArrayList<>(user.getGroups());
+            for (Group group : groupsToUpdate) {
+                groupAssignmentService.addUserToGroup(user, group);
             }
         }
 
@@ -79,6 +84,16 @@ public class OverseerUserController {
         if (!userDTO.getPassword().isEmpty()) {
             user.setPassword(new BCryptPasswordEncoder().encode(userDTO.getPassword()));
         }
+
+        if (userDTO.getGroupIds() != null) {
+            List<Group> groups = userDTO.getGroupIds().stream()
+                    .map(groupId -> groupService.findById(groupId).orElseThrow(() -> new RuntimeException("Group not found")))
+                    .collect(Collectors.toList());
+            user.setGroups(groups);
+        } else {
+            user.getGroups().clear();
+        }
+
         userService.save(user);
         return "redirect:/overseer/users";
     }

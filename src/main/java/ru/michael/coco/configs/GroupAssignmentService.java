@@ -29,15 +29,26 @@ public class GroupAssignmentService {
                     return newGroup;
                 });
 
+        setGroupByUserRole(user, group);
+    }
+
+    private void setGroupByUserRole(User user, Group group) {
         if (user.getRole() == User.Role.TEACHER) {
             group.setTeacher(user);
         } else if (user.getRole() == User.Role.STUDENT) {
-            group.getStudents().add(user);
+            if (!group.getStudents().contains(user)) {
+                group.getStudents().add(user);
+            }
         }
 
         user.getGroups().add(group);
 
         groupService.saveGroup(group);
         userService.save(user);
+    }
+
+    @Transactional
+    public void addUserToGroup(User user, Group group) {
+        setGroupByUserRole(user, group);
     }
 }

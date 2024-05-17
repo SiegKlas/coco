@@ -49,7 +49,12 @@ public class OverseerGroupController {
 
     @PostMapping("/create")
     public String createGroup(@ModelAttribute GroupDTO groupDTO) {
-        Group group = groupMapper.toEntity(groupDTO);
+        Group group = new Group();
+        if (groupDTO.getId() != null) {
+            group = groupMapper.toEntity(groupDTO);
+        } else if (groupDTO.getName() != null) {
+            group.setName(groupDTO.getName());
+        }
         if (groupDTO.getTeacherId() != null) {
             group.setTeacher(userService.findById(groupDTO.getTeacherId()).orElseThrow(() -> new RuntimeException("Teacher not found")));
         }
@@ -73,6 +78,8 @@ public class OverseerGroupController {
             group.setStudents(groupDTO.getStudentIds().stream()
                     .map(id -> userService.findById(id).orElseThrow(() -> new RuntimeException("Student not found")))
                     .collect(Collectors.toList()));
+        } else {
+            group.getStudents().clear();
         }
         groupService.saveGroup(group);
         return "redirect:/overseer/groups";

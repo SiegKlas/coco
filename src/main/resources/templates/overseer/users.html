@@ -30,6 +30,7 @@
                     <li th:each="groupId : ${user.groupIds}">
                         <span th:each="group : ${groups}" th:if="${group.id == groupId}" th:text="${group.name}"></span>
                     </li>
+                    <li th:each="group : ${groups}" th:if="${group.teacherId == user.id}" th:text="${group.name}"></li>
                 </ul>
             </td>
             <td th:text="${user.email}"></td>
@@ -93,7 +94,7 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    let users = /*[[${users}]]*/ [[${users}] as JSON];
+    let users = /*[[${users}]]*/ [];
     /*]]>*/
 </script>
 
@@ -106,9 +107,6 @@
     }
 
     function showEditUserModal(userId) {
-        console.log('All users:', users);
-        console.log('User ID to edit:', userId);
-
         let user = users.find(u => u.id === userId);
         if (!user) {
             console.error('User not found:', userId);
