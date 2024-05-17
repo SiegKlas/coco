@@ -43,26 +43,6 @@ public class DataLoaderConfig {
         this.groupService = groupService;
         this.groupAssignmentService = groupAssignmentService;
     }
-
-
-    //    @Bean
-//    public CommandLineRunner tasksLoader() {
-//        return args -> {
-//            topicDescriptionService.deleteAll();
-//            try (Stream<Path> stream = Files.walk(Path.of(xbankDir))) {
-//                stream.filter(Files::isDirectory)
-//                        .skip(1)
-//                        .forEach(p -> {
-//                            try {
-//                                taskDescriptionService.createTaskDescriptionByPath(p);
-//                            } catch (IOException e) {
-//                                throw new RuntimeException(e);
-//                            }
-//                        });
-//            }
-//        };
-//    }
-//
     @Bean
     public CommandLineRunner userLoader() {
         return args -> {
@@ -88,7 +68,7 @@ public class DataLoaderConfig {
 
                     userService.save(user); // Сохранение пользователя до добавления группы
 
-                    if (!groupName.equals("null")) {
+                    if (!groupName.equals("null") && !groupName.isEmpty()) {
                         groupAssignmentService.addUserToGroup(user, groupName);
                     }
                 }
@@ -97,18 +77,4 @@ public class DataLoaderConfig {
             }
         };
     }
-//
-//    @Bean
-//    @DependsOn({"tasksLoader", "userLoader"})
-//    public CommandLineRunner tasksInit() {
-//        return args -> {
-//            List<User> users = userService.findAll();
-//            List<TaskDescription> descriptions = taskDescriptionService.findAll();
-//
-//            users.forEach(u -> descriptions.forEach(d -> {
-//                Task task = new Task(u, d, new ArrayList<>());
-//                taskService.save(task);
-//            }));
-//        };
-//    }
 }

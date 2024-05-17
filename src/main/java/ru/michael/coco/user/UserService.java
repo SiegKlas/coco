@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.michael.coco.group.Group;
 import ru.michael.coco.group.GroupRepository;
+import ru.michael.coco.group.GroupService;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,11 +14,13 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final GroupRepository groupRepository;
+    private final GroupService groupService;
 
     @Autowired
-    public UserService(UserRepository userRepository, GroupRepository groupRepository) {
+    public UserService(UserRepository userRepository, GroupRepository groupRepository, GroupService groupService) {
         this.userRepository = userRepository;
         this.groupRepository = groupRepository;
+        this.groupService = groupService;
     }
 
     public Optional<User> findByUsername(String username) {
@@ -51,6 +54,9 @@ public class UserService {
         // Удаление пользователя из всех групп
         for (Group group : user.getGroups()) {
             group.getStudents().remove(user);
+            if (group.getTeacher() != null && group.getTeacher().equals(user)) {
+                group.setTeacher(null);
+            }
             groupRepository.save(group);
         }
 

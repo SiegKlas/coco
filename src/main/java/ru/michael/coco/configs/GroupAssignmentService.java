@@ -28,9 +28,16 @@ public class GroupAssignmentService {
                     groupService.saveGroup(newGroup);
                     return newGroup;
                 });
+
+        if (user.getRole() == User.Role.TEACHER) {
+            group.setTeacher(user);
+        } else if (user.getRole() == User.Role.STUDENT) {
+            group.getStudents().add(user);
+        }
+
         user.getGroups().add(group);
-        group.getStudents().add(user);
-        groupService.saveGroup(group); // Сохранение изменений в группе
-        userService.save(user); // Сохранение пользователя с добавленной группой
+
+        groupService.saveGroup(group);
+        userService.save(user);
     }
 }

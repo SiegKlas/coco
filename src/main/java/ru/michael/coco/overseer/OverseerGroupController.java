@@ -50,8 +50,14 @@ public class OverseerGroupController {
     @PostMapping("/create")
     public String createGroup(@ModelAttribute GroupDTO groupDTO) {
         Group group = groupMapper.toEntity(groupDTO);
-        group.setTeacher(userService.findById(groupDTO.getTeacherId()).orElseThrow(() -> new RuntimeException("Teacher not found")));
-        group.setStudents(groupDTO.getStudentIds().stream().map(id -> userService.findById(id).orElseThrow(() -> new RuntimeException("Student not found"))).collect(Collectors.toList()));
+        if (groupDTO.getTeacherId() != null) {
+            group.setTeacher(userService.findById(groupDTO.getTeacherId()).orElseThrow(() -> new RuntimeException("Teacher not found")));
+        }
+        if (groupDTO.getStudentIds() != null) {
+            group.setStudents(groupDTO.getStudentIds().stream()
+                    .map(id -> userService.findById(id).orElseThrow(() -> new RuntimeException("Student not found")))
+                    .collect(Collectors.toList()));
+        }
         groupService.saveGroup(group);
         return "redirect:/overseer/groups";
     }
@@ -60,8 +66,14 @@ public class OverseerGroupController {
     public String updateGroup(@ModelAttribute GroupDTO groupDTO) {
         Group group = groupService.findById(groupDTO.getId()).orElseThrow(() -> new RuntimeException("Group not found"));
         group.setName(groupDTO.getName());
-        group.setTeacher(userService.findById(groupDTO.getTeacherId()).orElseThrow(() -> new RuntimeException("Teacher not found")));
-        group.setStudents(groupDTO.getStudentIds().stream().map(id -> userService.findById(id).orElseThrow(() -> new RuntimeException("Student not found"))).collect(Collectors.toList()));
+        if (groupDTO.getTeacherId() != null) {
+            group.setTeacher(userService.findById(groupDTO.getTeacherId()).orElseThrow(() -> new RuntimeException("Teacher not found")));
+        }
+        if (groupDTO.getStudentIds() != null) {
+            group.setStudents(groupDTO.getStudentIds().stream()
+                    .map(id -> userService.findById(id).orElseThrow(() -> new RuntimeException("Student not found")))
+                    .collect(Collectors.toList()));
+        }
         groupService.saveGroup(group);
         return "redirect:/overseer/groups";
     }

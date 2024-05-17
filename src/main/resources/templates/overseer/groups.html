@@ -68,6 +68,7 @@
                     <div class="form-group">
                         <label for="teacher">Select Teacher</label>
                         <select class="form-control" id="teacher" name="teacherId">
+                            <option disabled selected value="">Select a teacher</option>
                             <option th:each="teacher : ${teachers}" th:text="${teacher.username}"
                                     th:value="${teacher.id}"></option>
                         </select>
@@ -104,9 +105,6 @@
     }
 
     function showEditGroupModal(groupId) {
-        console.log('All groups:', groups);
-        console.log('Group ID to edit:', groupId);
-
         let group = groups.find(g => g.id === groupId);
         if (!group) {
             console.error('Group not found:', groupId);
@@ -118,7 +116,7 @@
         document.getElementById('teacher').value = group.teacherId != null ? group.teacherId : '';
         let studentsSelect = document.getElementById('students');
         Array.from(studentsSelect.options).forEach(option => {
-            option.selected = group.studentIds.includes(parseInt(option.value));
+            option.selected = group.studentIds ? group.studentIds.includes(parseInt(option.value)) : false;
         });
         document.getElementById('groupForm').action = '/overseer/groups/update';
         $('#groupModal').modal('show');

@@ -39,12 +39,7 @@ public class OverseerUserController {
         List<User> users = userService.findAll();
         List<UserDTO> userDTOs = users.stream().map(userMapper::toDTO).collect(Collectors.toList());
         List<Group> groups = groupService.findAllGroups();
-        List<GroupDTO> groupDTOs = groups.stream().map(group -> {
-            GroupDTO groupDTO = new GroupDTO();
-            groupDTO.setId(group.getId());
-            groupDTO.setName(group.getName());
-            return groupDTO;
-        }).collect(Collectors.toList());
+        List<GroupDTO> groupDTOs = groups.stream().map(groupMapper::toDTO).collect(Collectors.toList());
         model.addAttribute("users", userDTOs);
         model.addAttribute("groups", groupDTOs);
         return "overseer/users";
@@ -54,7 +49,24 @@ public class OverseerUserController {
     public String createUser(@ModelAttribute UserDTO userDTO) {
         User user = userMapper.toEntity(userDTO);
         user.setPassword(new BCryptPasswordEncoder().encode(userDTO.getPassword()));
+
+        if (userDTO.getGroupIds() != null && !userDTO.getGroupIds().isEmpty()) {
+            List<Group> groups = userDTO.getGroupIds().stream()
+                    .map(groupId -> groupService.findById(groupId).orElseThrow(() -> new RuntimeException("Group not found")))
+                    .collect(Collectors.toList());
+            user.setGroups(groups);
+        }
+
         userService.save(user);
+
+        // Сохранение пользователя в группы
+        if (user.getGroups() != null && !user.getGroups().isEmpty()) {
+            for (Group group : user.getGroups()) {
+                group.getStudents().add(user);
+                groupService.saveGroup(group);
+            }
+        }
+
         return "redirect:/overseer/users";
     }
 

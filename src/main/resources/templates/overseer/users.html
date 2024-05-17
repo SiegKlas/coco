@@ -93,7 +93,7 @@
 
 <script th:inline="javascript">
     /*<![CDATA[*/
-    let users = /*[[${users}]]*/ [];
+    let users = /*[[${users}]]*/ [[${users}] as JSON];
     /*]]>*/
 </script>
 
@@ -122,7 +122,7 @@
         document.getElementById('email').value = user.email;
         let groupsSelect = document.getElementById('groups');
         Array.from(groupsSelect.options).forEach(option => {
-            option.selected = user.groupIds.includes(parseInt(option.value));
+            option.selected = user.groupIds ? user.groupIds.includes(parseInt(option.value)) : false;
         });
         document.getElementById('userForm').action = '/overseer/users/update';
         $('#userModal').modal('show');
