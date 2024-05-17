@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.michael.coco.group.Group;
 import ru.michael.coco.group.GroupDTO;
+import ru.michael.coco.group.GroupMapper;
 import ru.michael.coco.group.GroupService;
 import ru.michael.coco.user.User;
 import ru.michael.coco.user.UserDTO;
@@ -23,12 +24,14 @@ public class OverseerUserController {
     private final UserService userService;
     private final GroupService groupService;
     private final UserMapper userMapper;
+    private final GroupMapper groupMapper;
 
     @Autowired
-    public OverseerUserController(UserService userService, GroupService groupService, UserMapper userMapper) {
+    public OverseerUserController(UserService userService, GroupService groupService, UserMapper userMapper, GroupMapper groupMapper) {
         this.userService = userService;
         this.groupService = groupService;
         this.userMapper = userMapper;
+        this.groupMapper = groupMapper;
     }
 
     @GetMapping

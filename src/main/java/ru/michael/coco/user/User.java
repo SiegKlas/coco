@@ -1,10 +1,8 @@
 package ru.michael.coco.user;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,8 +16,7 @@ import java.util.List;
 
 @Data
 @Entity
-@RequiredArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PUBLIC, force = true)
+@NoArgsConstructor
 @Table(name = "_user")
 public class User implements UserDetails {
     private Role role;
@@ -28,6 +25,7 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
     }
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

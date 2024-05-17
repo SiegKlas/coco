@@ -12,4 +12,6 @@ public class UserDTO {
     private User.Role role;
     private String email;
     private List<Long> groupIds;
+    private List<String> groupNames;
 }
+

@@ -2,6 +2,7 @@ package ru.michael.coco.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.michael.coco.group.Group;
 import ru.michael.coco.group.GroupRepository;
 
@@ -43,7 +44,16 @@ public class UserService {
         return userRepository.findById(id);
     }
 
+    @Transactional
     public void deleteUserById(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Удаление пользователя из всех групп
+        for (Group group : user.getGroups()) {
+            group.getStudents().remove(user);
+            groupRepository.save(group);
+        }
+
         userRepository.deleteById(id);
     }
 

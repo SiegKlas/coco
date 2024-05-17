@@ -27,13 +27,15 @@
             <td th:text="${user.role}"></td>
             <td>
                 <ul>
-                    <li th:each="groupId : ${user.groupIds}" th:text="${groupId}"></li>
+                    <li th:each="groupId : ${user.groupIds}">
+                        <span th:each="group : ${groups}" th:if="${group.id == groupId}" th:text="${group.name}"></span>
+                    </li>
                 </ul>
             </td>
             <td th:text="${user.email}"></td>
             <td>
-                <button class="btn btn-primary" onclick="showEditUserModal([[${user}]])">Edit</button>
-                <button class="btn btn-danger" onclick="deleteUser([[${user.id}]])">Delete</button>
+                <button class="btn btn-primary" th:attr="onclick='showEditUserModal(' + ${user.id} + ');'">Edit</button>
+                <button class="btn btn-danger" th:attr="onclick='deleteUser(' + ${user.id} + ');'">Delete</button>
             </td>
         </tr>
         </tbody>
@@ -89,6 +91,12 @@
     </div>
 </div>
 
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    let users = /*[[${users}]]*/ [];
+    /*]]>*/
+</script>
+
 <script>
     function showCreateUserModal() {
         document.getElementById('userForm').reset();
@@ -97,7 +105,16 @@
         $('#userModal').modal('show');
     }
 
-    function showEditUserModal(user) {
+    function showEditUserModal(userId) {
+        console.log('All users:', users);
+        console.log('User ID to edit:', userId);
+
+        let user = users.find(u => u.id === userId);
+        if (!user) {
+            console.error('User not found:', userId);
+            return;
+        }
+
         document.getElementById('userId').value = user.id;
         document.getElementById('username').value = user.username;
         document.getElementById('password').value = '';

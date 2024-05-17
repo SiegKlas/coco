@@ -23,15 +23,25 @@
         <tr th:each="group : ${groups}">
             <td th:text="${group.id}"></td>
             <td th:text="${group.name}"></td>
-            <td th:text="${group.teacherId != null ? group.teacherId : 'N/A'}"></td>
+            <td>
+                <span th:if="${group.teacherId != null}">
+                    <span th:each="teacher : ${teachers}" th:if="${teacher.id == group.teacherId}"
+                          th:text="${teacher.username}"></span>
+                </span>
+                <span th:if="${group.teacherId == null}">N/A</span>
+            </td>
             <td>
                 <ul>
-                    <li th:each="studentId : ${group.studentIds}" th:text="${studentId}"></li>
+                    <li th:each="studentId : ${group.studentIds}">
+                        <span th:each="student : ${students}" th:if="${student.id == studentId}"
+                              th:text="${student.username}"></span>
+                    </li>
                 </ul>
             </td>
             <td>
-                <button class="btn btn-primary" onclick="showEditGroupModal([[${group}]])">Edit</button>
-                <button class="btn btn-danger" onclick="deleteGroup([[${group.id}]])">Delete</button>
+                <button class="btn btn-primary" th:attr="onclick='showEditGroupModal(' + ${group.id} + ');'">Edit
+                </button>
+                <button class="btn btn-danger" th:attr="onclick='deleteGroup(' + ${group.id} + ');'">Delete</button>
             </td>
         </tr>
         </tbody>
@@ -79,6 +89,12 @@
     </div>
 </div>
 
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    let groups = /*[[${groups}]]*/ [];
+    /*]]>*/
+</script>
+
 <script>
     function showCreateGroupModal() {
         document.getElementById('groupForm').reset();
@@ -87,7 +103,16 @@
         $('#groupModal').modal('show');
     }
 
-    function showEditGroupModal(group) {
+    function showEditGroupModal(groupId) {
+        console.log('All groups:', groups);
+        console.log('Group ID to edit:', groupId);
+
+        let group = groups.find(g => g.id === groupId);
+        if (!group) {
+            console.error('Group not found:', groupId);
+            return;
+        }
+
         document.getElementById('groupId').value = group.id;
         document.getElementById('name').value = group.name;
         document.getElementById('teacher').value = group.teacherId != null ? group.teacherId : '';
