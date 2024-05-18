@@ -24,6 +24,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -112,6 +114,13 @@ public class AdminGroupController {
         Bank bank = bankService.findById(bankid).orElseThrow(() -> new RuntimeException("Bank not found"));
         bankStructureService.deleteByBank(bank);
         bankService.deleteById(bankid);
+
+        Path bankDirPath = Paths.get(groupsDir, groupid.toString(), bank.getName());
+        try {
+            FileUtils.deleteRecursively(bankDirPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return "redirect:/admin/groups/banks?groupid=" + groupid;
     }

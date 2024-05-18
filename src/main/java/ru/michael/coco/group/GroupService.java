@@ -5,6 +5,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.michael.coco.bank.Bank;
+import ru.michael.coco.bank.BankService;
+import ru.michael.coco.bank.tree.BankStructureService;
 import ru.michael.coco.user.User;
 
 import java.io.File;
@@ -20,11 +22,15 @@ import java.util.Optional;
 public class GroupService {
     private final GroupRepository groupRepository;
     private final String groupsDir;
+    private final BankStructureService bankStructureService;
+    private final BankService bankService;
 
     @Autowired
-    public GroupService(GroupRepository groupRepository, @Value("${file.groups-dir}") String groupsDir) {
+    public GroupService(GroupRepository groupRepository, @Value("${file.groups-dir}") String groupsDir, BankStructureService bankStructureService, BankService bankService) {
         this.groupRepository = groupRepository;
         this.groupsDir = groupsDir;
+        this.bankStructureService = bankStructureService;
+        this.bankService = bankService;
     }
 
     public List<Group> findAllGroups() {
@@ -54,6 +60,11 @@ public class GroupService {
     }
 
     public void deleteGroupById(Long id) {
+        Group group = groupRepository.findById(id).orElseThrow(() -> new RuntimeException("Group not found"));
+        for (Bank bank : group.getBanks()) {
+            bankStructureService.deleteByBank(bank);
+            bankService.deleteById(bank.getId());
+        }
         groupRepository.deleteById(id);
         deleteGroupDirectory(id);
     }

@@ -1,13 +1,11 @@
 package ru.michael.coco.bank;
 
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.michael.coco.group.Group;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,8 +34,7 @@ public class BankService {
     }
 
     public void deleteById(Long id) {
-        Bank bank = bankRepository.findById(id).orElseThrow(() -> new RuntimeException("Bank not found"));
-        deleteBankDirectory(bank.getGroup().getId(), bank.getName());
+        //Bank bank = bankRepository.findById(id).orElseThrow(() -> new RuntimeException("Bank not found"));
         bankRepository.deleteById(id);
     }
 
@@ -45,17 +42,6 @@ public class BankService {
         File bankDir = new File(groupsDir + "/" + groupId, bankName);
         if (!bankDir.exists()) {
             bankDir.mkdirs();
-        }
-    }
-
-    private void deleteBankDirectory(Long groupId, String bankName) {
-        File bankDir = new File(groupsDir + "/" + groupId, bankName);
-        if (bankDir.exists()) {
-            try {
-                FileUtils.deleteDirectory(bankDir);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
