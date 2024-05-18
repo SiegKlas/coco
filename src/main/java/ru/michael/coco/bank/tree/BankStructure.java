@@ -1,5 +1,7 @@
 package ru.michael.coco.bank.tree;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -19,9 +21,12 @@ public class BankStructure {
 
     @OneToOne
     @JoinColumn(name = "bank_id")
+    @JsonBackReference
     private Bank bank;
 
     @OneToMany(mappedBy = "bankStructure", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<BankTopic> topics = new ArrayList<>();
 }
+
 

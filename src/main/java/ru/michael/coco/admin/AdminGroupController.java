@@ -1,6 +1,7 @@
 package ru.michael.coco.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,8 +22,10 @@ import ru.michael.coco.user.UserService;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin/groups")
@@ -36,6 +39,8 @@ public class AdminGroupController {
     private final BankStructureService bankStructureService;
     private final BankLevelService bankLevelService;
     private final BankTopicService bankTopicService;
+    @Value("${file.groups-dir}")
+    private String groupsDir;
 
     @Autowired
     public AdminGroupController(GroupService groupService, UserService userService, BankService bankService, GroupMapper groupMapper, BankMapper bankMapper, UserMapper userMapper, BankStructureService bankStructureService, BankLevelService bankLevelService, BankTopicService bankTopicService) {
@@ -116,7 +121,13 @@ public class AdminGroupController {
     @ResponseBody
     public ResponseEntity<String> generateBank(@RequestParam Long bankid) {
         Bank bank = bankService.findById(bankid).orElseThrow(() -> new RuntimeException("Bank not found"));
-        String bankDir = "/path/to/bank/directory"; // Замените на ваш путь
+        Long groupId = bank.getGroup().getId();
+        String bankDir = groupsDir + "\\" + groupId + "\\" + bank.getName();
+
+        File bankDirFile = new File(bankDir);
+        if (!bankDirFile.exists()) {
+            bankDirFile.mkdirs();
+        }
 
         generateBDFFile(bank, bankDir);
         sendBankToPythonServer(bankDir);
@@ -138,11 +149,22 @@ public class AdminGroupController {
     @GetMapping("/topics/edit")
     public String editTopic(@RequestParam Long topicId, Model model) {
         BankTopic topic = bankTopicService.findById(topicId).orElseThrow(() -> new RuntimeException("Topic not found"));
+
+        // Получение списка директорий как строки
+        File baseDir = new File("D:\\diploma\\robot\\exfiles");
+        File[] directories = baseDir.listFiles(File::isDirectory);
+        List<String> directoryNames = Arrays.stream(directories)
+                .map(File::getName)
+                .collect(Collectors.toList());
+
         model.addAttribute("topic", topic);
         model.addAttribute("levels", topic.getLevels());
         model.addAttribute("topicId", topic.getId());
+        model.addAttribute("directories", directoryNames);  // Передаем список директорий как строки
+
         return "admin/edit-topic";
     }
+
 
     @PostMapping("/levels/add")
     public String addLevel(@RequestParam Long topicid) {
@@ -157,10 +179,17 @@ public class AdminGroupController {
     @PostMapping("/levels/edit")
     public String editLevel(@RequestParam Long levelId, @RequestParam String exFiles) {
         BankLevel level = bankLevelService.findById(levelId).orElseThrow(() -> new RuntimeException("Level not found"));
-        level.setExFiles(Arrays.asList(exFiles.split(",")));
+        level.setExFiles(new ArrayList<>(Arrays.asList(exFiles.split("\\n")))); // Создаем новый изменяемый список
         bankLevelService.saveBankLevel(level);
 
         return "redirect:/admin/groups/topics/edit?topicId=" + level.getBankTopic().getId();
+    }
+
+    @GetMapping("/levels/{id}")
+    @ResponseBody
+    public ResponseEntity<BankLevel> getLevel(@PathVariable Long id) {
+        BankLevel level = bankLevelService.findById(id).orElseThrow(() -> new RuntimeException("Level not found"));
+        return ResponseEntity.ok(level);
     }
 
     private void generateBDFFile(Bank bank, String bankDir) {
@@ -175,18 +204,25 @@ public class AdminGroupController {
                 writer.newLine();
                 for (int i = 0; i < topic.getLevels().size(); i++) {
                     BankLevel level = topic.getLevels().get(i);
-                    writer.write(String.join(",", level.getExFiles()));
+                    List<String> exFilePaths = level.getExFiles().stream()
+                            .map(this::getRelativePath)
+                            .collect(Collectors.toList());
+                    writer.write(String.join(",", exFilePaths));
                     if (i < topic.getLevels().size() - 1) {
                         writer.write(";");
                     }
-                    writer.newLine();
                 }
+                writer.newLine();
                 writer.newLine();
             }
             writer.write("::");
         } catch (IOException e) {
             throw new RuntimeException("Error generating BDF file", e);
         }
+    }
+
+    private String getRelativePath(String filePath) {
+        return filePath.replace("\\", "/").trim();
     }
 
     private void sendBankToPythonServer(String bankDir) {
