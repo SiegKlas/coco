@@ -132,6 +132,7 @@ public class AdminGroupController {
         model.addAttribute("bankId", bankid);
         model.addAttribute("bankStructureId", bankStructure.getId());
         model.addAttribute("topics", bankStructure.getTopics());
+        model.addAttribute("groupId", bank.getGroup().getId());
         return "admin/edit-bank";
     }
 
@@ -179,6 +180,7 @@ public class AdminGroupController {
         model.addAttribute("levels", topic.getLevels());
         model.addAttribute("topicId", topic.getId());
         model.addAttribute("directories", directoryNames);  // Передаем список директорий как строки
+        model.addAttribute("bankId", topic.getBankStructure().getBank().getId());
 
         return "admin/edit-topic";
     }

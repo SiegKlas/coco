@@ -8,6 +8,7 @@
 <body>
 <div class="container mt-3">
     <h1>Banks</h1>
+    <a class="btn btn-secondary" th:href="@{'/admin/groups?groupid=' + ${groupId}}">Back</a>
     <button class="btn btn-success" onclick="showCreateBankModal()">Create New</button>
     <table class="table mt-3">
         <thead>
