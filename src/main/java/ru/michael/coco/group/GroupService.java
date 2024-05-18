@@ -3,6 +3,9 @@ package ru.michael.coco.group;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import ru.michael.coco.bank.Bank;
+import ru.michael.coco.user.User;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +33,19 @@ public class GroupService {
 
     public Optional<Group> findById(Long id) {
         return groupRepository.findById(id);
+    }
+
+    public List<Group> findGroupsByTeacher(User teacher) {
+        return groupRepository.findAllByTeacher(teacher);
+    }
+
+    @Transactional
+    public void setActiveBank(Long groupId, Long bankId) {
+        Group group = groupRepository.findById(groupId).orElseThrow(() -> new RuntimeException("Group not found"));
+        Bank bank = group.getBanks().stream().filter(b -> b.getId().equals(bankId)).findFirst()
+                .orElseThrow(() -> new RuntimeException("Bank not found in group"));
+        group.setActiveBank(bank);
+        groupRepository.save(group);
     }
 
     public void saveGroup(Group group) {

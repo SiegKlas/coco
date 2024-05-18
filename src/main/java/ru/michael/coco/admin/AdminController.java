@@ -42,7 +42,6 @@ public class AdminController {
         this.groupService = groupService;
     }
 
-    // Отображение главной страницы администратора с обзором всех чатов
     @GetMapping
     public String getAdminPage(Model model) {
         List<Chat> chats = chatService.getAllChats();
@@ -50,7 +49,6 @@ public class AdminController {
         return "admin/main";
     }
 
-    // Отображение страницы с уведомлениями о непрочитанных сообщениях
     @GetMapping("/notifications")
     public String getNotificationsPage(Model model, @AuthenticationPrincipal UserDetails userDetails) {
         User admin = userService.findByUsername(userDetails.getUsername()).orElseThrow();

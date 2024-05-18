@@ -2,6 +2,7 @@ package ru.michael.coco.bank;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.michael.coco.group.Group;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,5 +30,9 @@ public class BankService {
 
     public void deleteById(Long id) {
         bankRepository.deleteById(id);
+    }
+
+    public List<Bank> findByGroup(Group group) {
+        return bankRepository.findAllByGroup(group);
     }
 }
