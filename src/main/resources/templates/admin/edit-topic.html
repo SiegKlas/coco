@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Topic</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-3">
+    <h1>Edit Topic</h1>
+    <table class="table mt-3">
+        <thead>
+        <tr>
+            <th>Level Number</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="level, iter : ${levels}">
+            <td th:text="${iter.index + 1}"></td>
+            <td>
+                <button class="btn btn-primary" th:onclick="'showEditLevelModal(' + ${level.id} + ')'">Edit</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-success" th:onclick="'addLevel(' + ${topicId} + ')'">+</button>
+</div>
+
+<script>
+    function addLevel(topicId) {
+        $.post('/admin/groups/levels/add', {topicid: topicId})
+            .done(function () {
+                location.reload();
+            });
+    }
+
+    function showEditLevelModal(levelId) {
+        // Логика для открытия модального окна редактирования уровня
+    }
+</script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>

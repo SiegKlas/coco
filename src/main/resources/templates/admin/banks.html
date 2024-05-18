@@ -1,13 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Bank Management</title>
+    <title>Group Banks</title>
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
 <div class="container mt-3">
-    <h1>Bank Management</h1>
+    <h1>Banks</h1>
     <button class="btn btn-success" onclick="showCreateBankModal()">Create New</button>
     <table class="table mt-3">
         <thead>
@@ -22,16 +22,15 @@
             <td th:text="${bank.id}"></td>
             <td th:text="${bank.name}"></td>
             <td>
-                <form method="post" style="display:inline;" th:action="@{/admin/groups/banks/make-active}">
+                <a class="btn btn-primary" th:href="@{/admin/groups/banks/edit(bankid=${bank.id})}">Edit</a>
+                <a class="btn btn-success" th:href="@{/admin/groups/banks/make-active(groupid=${groupId}, bankid=${bank.id})}"
+                   th:if="${bank.id != activeBank?.id}">Make Active</a>
+                <a class="btn btn-secondary disabled" th:if="${bank.id == activeBank?.id}">Active</a>
+                <form method="post" style="display:inline;" th:action="@{/admin/groups/banks/delete}">
                     <input name="groupid" th:value="${groupId}" type="hidden">
                     <input name="bankid" th:value="${bank.id}" type="hidden">
-                    <button class="btn btn-success" th:if="${bank.id != activeBank?.id}" type="submit">Make Active
-                    </button>
-                    <button class="btn btn-secondary disabled" th:if="${bank.id == activeBank?.id}" type="button">
-                        Active
-                    </button>
+                    <button class="btn btn-danger" type="submit">Delete</button>
                 </form>
-                <a class="btn btn-primary" th:href="@{/admin/groups/banks/edit(groupid=${groupId}, bankid=${bank.id})}">Edit</a>
             </td>
         </tr>
         </tbody>
@@ -39,38 +38,40 @@
 </div>
 
 <!-- Create Bank Modal -->
-<div class="modal" id="createBankModal" role="dialog" tabindex="-1">
+<div aria-hidden="true" aria-labelledby="createBankModalLabel" class="modal fade" id="createBankModal" role="dialog"
+     tabindex="-1">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="post" th:action="@{/admin/groups/banks/create}">
                 <div class="modal-header">
-                    <h5 class="modal-title">Create New Bank</h5>
+                    <h5 class="modal-title" id="createBankModalLabel">Create Bank</h5>
                     <button aria-label="Close" class="close" data-dismiss="modal" type="button">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="name">Bank Name</label>
-                        <input class="form-control" id="name" name="name" required type="text">
-                    </div>
                     <input name="groupid" th:value="${groupId}" type="hidden">
+                    <div class="form-group">
+                        <label for="bankName">Bank Name</label>
+                        <input class="form-control" id="bankName" name="name" required type="text">
+                    </div>
                 </div>
                 <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Close</button>
                     <button class="btn btn-primary" type="submit">Save</button>
-                    <button class="btn btn-secondary" data-dismiss="modal" type="button">Cancel</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script>
     function showCreateBankModal() {
         $('#createBankModal').modal('show');
     }
 </script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 </body>
 </html>

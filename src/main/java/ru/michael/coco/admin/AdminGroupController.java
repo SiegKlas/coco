@@ -1,15 +1,16 @@
 package ru.michael.coco.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.michael.coco.bank.Bank;
-import ru.michael.coco.bank.BankDTO;
 import ru.michael.coco.bank.BankMapper;
 import ru.michael.coco.bank.BankService;
+import ru.michael.coco.bank.tree.*;
 import ru.michael.coco.group.Group;
 import ru.michael.coco.group.GroupMapper;
 import ru.michael.coco.group.GroupService;
@@ -17,6 +18,10 @@ import ru.michael.coco.user.User;
 import ru.michael.coco.user.UserMapper;
 import ru.michael.coco.user.UserService;
 
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -28,15 +33,21 @@ public class AdminGroupController {
     private final GroupMapper groupMapper;
     private final BankMapper bankMapper;
     private final UserMapper userMapper;
+    private final BankStructureService bankStructureService;
+    private final BankLevelService bankLevelService;
+    private final BankTopicService bankTopicService;
 
     @Autowired
-    public AdminGroupController(GroupService groupService, UserService userService, BankService bankService, GroupMapper groupMapper, BankMapper bankMapper, UserMapper userMapper) {
+    public AdminGroupController(GroupService groupService, UserService userService, BankService bankService, GroupMapper groupMapper, BankMapper bankMapper, UserMapper userMapper, BankStructureService bankStructureService, BankLevelService bankLevelService, BankTopicService bankTopicService) {
         this.groupService = groupService;
         this.userService = userService;
         this.bankService = bankService;
         this.groupMapper = groupMapper;
         this.bankMapper = bankMapper;
         this.userMapper = userMapper;
+        this.bankStructureService = bankStructureService;
+        this.bankLevelService = bankLevelService;
+        this.bankTopicService = bankTopicService;
     }
 
     @GetMapping
@@ -71,31 +82,141 @@ public class AdminGroupController {
         Bank bank = new Bank(group);
         bank.setName(name);
         bankService.saveBank(bank);
+
+        BankStructure bankStructure = new BankStructure();
+        bankStructure.setBank(bank);
+        bankStructureService.saveBankStructure(bankStructure);
+
         return "redirect:/admin/groups/banks?groupid=" + groupId;
     }
 
     @PostMapping("/banks/make-active")
-    public String makeBankActive(@RequestParam("groupid") Long groupId, @RequestParam("bankid") Long bankId) {
-        Group group = groupService.findById(groupId).orElseThrow(() -> new RuntimeException("Group not found"));
-        Bank bank = bankService.findById(bankId).orElseThrow(() -> new RuntimeException("Bank not found"));
-        group.setActiveBank(bank);
-        groupService.saveGroup(group);
-        return "redirect:/admin/groups/banks?groupid=" + groupId;
+    public String makeBankActive(@RequestParam Long groupid, @RequestParam Long bankid) {
+        groupService.setActiveBank(groupid, bankid);
+        return "redirect:/admin/groups/banks?groupid=" + groupid;
+    }
+
+    @PostMapping("/banks/delete")
+    public String deleteBank(@RequestParam Long groupid, @RequestParam Long bankid) {
+        bankService.deleteById(bankid);
+        return "redirect:/admin/groups/banks?groupid=" + groupid;
     }
 
     @GetMapping("/banks/edit")
-    public String editBank(@RequestParam("groupid") Long groupId, @RequestParam("bankid") Long bankId, Model model) {
-        Bank bank = bankService.findById(bankId).orElseThrow(() -> new RuntimeException("Bank not found"));
-        model.addAttribute("bank", bankMapper.toDTO(bank));
-        model.addAttribute("groupId", groupId);
+    public String editBank(@RequestParam Long bankid, Model model) {
+        Bank bank = bankService.findById(bankid).orElseThrow(() -> new RuntimeException("Bank not found"));
+        BankStructure bankStructure = bankStructureService.findByBank(bank).orElseThrow(() -> new RuntimeException("Bank structure not found"));
+        model.addAttribute("bankId", bankid);
+        model.addAttribute("bankStructureId", bankStructure.getId());
+        model.addAttribute("topics", bankStructure.getTopics());
         return "admin/edit-bank";
     }
 
-    @PostMapping("/banks/update")
-    public String updateBank(@ModelAttribute BankDTO bankDTO) {
-        Bank bank = bankService.findById(bankDTO.getId()).orElseThrow(() -> new RuntimeException("Bank not found"));
-        bank.setName(bankDTO.getName());
-        bankService.saveBank(bank);
-        return "redirect:/admin/groups/banks?groupid=" + bankDTO.getGroupId();
+    @PostMapping("/banks/generate")
+    @ResponseBody
+    public ResponseEntity<String> generateBank(@RequestParam Long bankid) {
+        Bank bank = bankService.findById(bankid).orElseThrow(() -> new RuntimeException("Bank not found"));
+        String bankDir = "/path/to/bank/directory"; // Замените на ваш путь
+
+        generateBDFFile(bank, bankDir);
+        sendBankToPythonServer(bankDir);
+
+        return ResponseEntity.ok("Bank generated successfully");
+    }
+
+    @PostMapping("/topics/create")
+    public String createTopic(@RequestParam Long bankStructureId, @RequestParam String name) {
+        BankStructure bankStructure = bankStructureService.findById(bankStructureId).orElseThrow(() -> new RuntimeException("Bank structure not found"));
+        BankTopic bankTopic = new BankTopic();
+        bankTopic.setBankStructure(bankStructure);
+        bankTopic.setName(name);
+        bankTopicService.saveBankTopic(bankTopic);
+
+        return "redirect:/admin/groups/banks/edit?bankid=" + bankStructure.getBank().getId();
+    }
+
+    @GetMapping("/topics/edit")
+    public String editTopic(@RequestParam Long topicId, Model model) {
+        BankTopic topic = bankTopicService.findById(topicId).orElseThrow(() -> new RuntimeException("Topic not found"));
+        model.addAttribute("topic", topic);
+        model.addAttribute("levels", topic.getLevels());
+        model.addAttribute("topicId", topic.getId());
+        return "admin/edit-topic";
+    }
+
+    @PostMapping("/levels/add")
+    public String addLevel(@RequestParam Long topicid) {
+        BankTopic topic = bankTopicService.findById(topicid).orElseThrow(() -> new RuntimeException("Topic not found"));
+        BankLevel bankLevel = new BankLevel();
+        bankLevel.setBankTopic(topic);
+        bankLevelService.saveBankLevel(bankLevel);
+
+        return "redirect:/admin/groups/topics/edit?topicId=" + topicid;
+    }
+
+    @PostMapping("/levels/edit")
+    public String editLevel(@RequestParam Long levelId, @RequestParam String exFiles) {
+        BankLevel level = bankLevelService.findById(levelId).orElseThrow(() -> new RuntimeException("Level not found"));
+        level.setExFiles(Arrays.asList(exFiles.split(",")));
+        bankLevelService.saveBankLevel(level);
+
+        return "redirect:/admin/groups/topics/edit?topicId=" + level.getBankTopic().getId();
+    }
+
+    private void generateBDFFile(Bank bank, String bankDir) {
+        File bdfFile = new File(bankDir, bank.getName() + ".bdf");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(bdfFile))) {
+            writer.write(bank.getName());
+            writer.newLine();
+            writer.newLine();
+            BankStructure bankStructure = bankStructureService.findByBank(bank).orElseThrow(() -> new RuntimeException("Bank Structure not found"));
+            for (BankTopic topic : bankStructure.getTopics()) {
+                writer.write("::" + topic.getName());
+                writer.newLine();
+                for (int i = 0; i < topic.getLevels().size(); i++) {
+                    BankLevel level = topic.getLevels().get(i);
+                    writer.write(String.join(",", level.getExFiles()));
+                    if (i < topic.getLevels().size() - 1) {
+                        writer.write(";");
+                    }
+                    writer.newLine();
+                }
+                writer.newLine();
+            }
+            writer.write("::");
+        } catch (IOException e) {
+            throw new RuntimeException("Error generating BDF file", e);
+        }
+    }
+
+    private void sendBankToPythonServer(String bankDir) {
+        try {
+            URL url = new URL("http://python-server-address/api/bank");
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type", "application/json");
+            connection.setDoOutput(true);
+
+            String jsonInputString = "{\"bankDir\": \"" + bankDir + "\"}";
+
+            try (OutputStream os = connection.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            int code = connection.getResponseCode();
+            System.out.println("Response Code : " + code);
+
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                System.out.println(response.toString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
