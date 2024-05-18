@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import ru.michael.coco.bank.Bank;
 import ru.michael.coco.bank.BankMapper;
 import ru.michael.coco.bank.BankService;
@@ -19,12 +20,11 @@ import ru.michael.coco.user.User;
 import ru.michael.coco.user.UserMapper;
 import ru.michael.coco.user.UserService;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -139,7 +139,7 @@ public class AdminGroupController {
         }
 
         generateBDFFile(bank, bankDir);
-        sendBankToPythonServer(bankDir);
+        sendBankToPythonServer(bankDir, bank.getName());
 
         return ResponseEntity.ok("Bank generated successfully");
     }
@@ -217,7 +217,9 @@ public class AdminGroupController {
                             .collect(Collectors.toList());
                     writer.write(String.join(",", exFilePaths));
                     if (i < topic.getLevels().size() - 1) {
+                        writer.newLine();
                         writer.write(";");
+                        writer.newLine();
                     }
                 }
                 writer.newLine();
@@ -230,36 +232,30 @@ public class AdminGroupController {
     }
 
     private String getRelativePath(String filePath) {
-        return filePath.replace("\\", "/").trim();
+        return filePath.replace("\\", "/").trim().replaceAll(".ex", "");
     }
 
-    private void sendBankToPythonServer(String bankDir) {
+    private void sendBankToPythonServer(String bankDir, String bankName) {
         try {
-            URL url = new URL("http://python-server-address/api/bank");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setDoOutput(true);
+            // Формируем путь до .bdf файла
+            String bdfPath = bankDir + "\\" + bankName + ".bdf";
 
-            String jsonInputString = "{\"bankDir\": \"" + bankDir + "\"}";
+            // Подготовка URL
+            String otherServerUrl = "http://127.0.0.1:5000/api/bank_new";
+            RestTemplate restTemplate = new RestTemplate();
 
-            try (OutputStream os = connection.getOutputStream()) {
-                byte[] input = jsonInputString.getBytes("utf-8");
-                os.write(input, 0, input.length);
-            }
+            // Подготовка JSON тела запроса
+            final Map<String, String> json = new HashMap<>();
+            json.put("bankDir", bdfPath);
 
-            int code = connection.getResponseCode();
-            System.out.println("Response Code : " + code);
+            // Отправка запроса
+            ResponseEntity<String> responseEntity = restTemplate.postForEntity(otherServerUrl, json, String.class);
 
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(), "utf-8"))) {
-                StringBuilder response = new StringBuilder();
-                String responseLine;
-                while ((responseLine = br.readLine()) != null) {
-                    response.append(responseLine.trim());
-                }
-                System.out.println(response.toString());
-            }
-        } catch (IOException e) {
+            // Получение и вывод ответа сервера
+            System.out.println("Response Code: " + responseEntity.getStatusCodeValue());
+            System.out.println("Response: " + responseEntity.getBody());
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
