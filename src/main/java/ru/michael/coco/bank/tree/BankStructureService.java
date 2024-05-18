@@ -26,5 +26,10 @@ public class BankStructureService {
     public void saveBankStructure(BankStructure bankStructure) {
         bankStructureRepository.save(bankStructure);
     }
+
+    public void deleteByBank(Bank bank) {
+        BankStructure bankStructure = bankStructureRepository.findByBank(bank).orElseThrow(() -> new RuntimeException("Bank structure not found"));
+        bankStructureRepository.delete(bankStructure);
+    }
 }
 

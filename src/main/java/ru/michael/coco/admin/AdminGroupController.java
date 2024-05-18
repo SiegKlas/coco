@@ -103,7 +103,16 @@ public class AdminGroupController {
 
     @PostMapping("/banks/delete")
     public String deleteBank(@RequestParam Long groupid, @RequestParam Long bankid) {
+        Group group = groupService.findById(groupid).orElseThrow(() -> new RuntimeException("Group not found"));
+        if (group.getActiveBank() != null && group.getActiveBank().getId().equals(bankid)) {
+            group.setActiveBank(null);
+            groupService.saveGroup(group);
+        }
+
+        Bank bank = bankService.findById(bankid).orElseThrow(() -> new RuntimeException("Bank not found"));
+        bankStructureService.deleteByBank(bank);
         bankService.deleteById(bankid);
+
         return "redirect:/admin/groups/banks?groupid=" + groupid;
     }
 
@@ -164,7 +173,6 @@ public class AdminGroupController {
 
         return "admin/edit-topic";
     }
-
 
     @PostMapping("/levels/add")
     public String addLevel(@RequestParam Long topicid) {
