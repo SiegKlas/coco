@@ -1,6 +1,7 @@
 package ru.michael.coco.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.michael.coco.entity.User;
@@ -13,14 +14,16 @@ import java.util.Optional;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User createUser(User user) {
-
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -33,7 +36,9 @@ public class UserService {
     }
 
     public User updateUser(User user) {
-
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
         return userRepository.save(user);
     }
 
@@ -41,4 +46,15 @@ public class UserService {
         userRepository.deleteById(id);
     }
 
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public List<User> getAllTeachers() {
+        return userRepository.findByRole(User.Role.TEACHER);
+    }
+
+    public List<User> getAllStudents() {
+        return userRepository.findByRole(User.Role.STUDENT);
+    }
 }

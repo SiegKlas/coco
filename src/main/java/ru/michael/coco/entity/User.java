@@ -6,8 +6,10 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 @Entity
@@ -30,6 +32,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<GroupUser> groupUsers = new ArrayList<>();
 
     public enum Role {
         STUDENT, TEACHER, OVERSEER
@@ -58,5 +63,21 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public List<Group> getGroups() {
+        return groupUsers.stream()
+                .map(GroupUser::getGroup)
+                .collect(Collectors.toList());
+    }
+
+    public void addGroupUser(GroupUser groupUser) {
+        groupUsers.add(groupUser);
+        groupUser.setUser(this);
+    }
+
+    public void removeGroupUser(GroupUser groupUser) {
+        groupUsers.remove(groupUser);
+        groupUser.setUser(null);
     }
 }

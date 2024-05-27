@@ -15,5 +15,4 @@ public class GroupUserService {
         this.groupUserRepository = groupUserRepository;
     }
 
-    // Методы сервиса для GroupUserRepository
 }

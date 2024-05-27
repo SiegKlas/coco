@@ -1,5 +1,6 @@
 package ru.michael.coco.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +17,13 @@ import ru.michael.coco.repository.UserRepository;
 
 @Configuration
 public class SecurityConfig {
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
+    @Autowired
+    public SecurityConfig(CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler) {
+        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -41,11 +49,13 @@ public class SecurityConfig {
                                 .requestMatchers(mvc.pattern("/overseer/**")).hasRole("OVERSEER")
                                 .requestMatchers(mvc.pattern("/h2-console/**")).permitAll()
                                 .requestMatchers(mvc.pattern("/login")).permitAll()
+                                .requestMatchers(mvc.pattern("/css/**"), mvc.pattern("/js/**")).permitAll()
                                 .requestMatchers(mvc.pattern("/"), mvc.pattern("/**")).authenticated()
                 ).formLogin(
                         formLogin -> formLogin
                                 .loginPage("/login")
-                                .defaultSuccessUrl("/tasks")
+                                .successHandler(customAuthenticationSuccessHandler)
+                                .permitAll()
                 ).logout(
                         logout -> logout
                                 .logoutUrl("/logout")
