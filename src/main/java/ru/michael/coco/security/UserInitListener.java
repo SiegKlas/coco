@@ -4,7 +4,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import ru.michael.coco.user.User;
+import ru.michael.coco.entity.User;
 import ru.michael.coco.user.UserRepository;
 
 //@Component

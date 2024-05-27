@@ -22,8 +22,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(UserRepository userRepo) {
-        return username -> (UserDetails) userRepo.findByUsername(username).orElseThrow();
+    public UserDetailsService userDetailsService(UserRepository userRepository) {
+        return username -> (UserDetails) userRepository.findByUsername(username).orElseThrow();
     }
 
     @Bean
@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         (authz) -> authz
                                 .requestMatchers(mvc.pattern("/ws/**")).permitAll()
-                                .requestMatchers(mvc.pattern("/admin/**")).permitAll()
+                                .requestMatchers(mvc.pattern("/teacher/**")).permitAll()
                                 .requestMatchers(mvc.pattern("/overseer/**")).permitAll()
                                 .requestMatchers(mvc.pattern("/files"), mvc.pattern("/files/upload")).hasRole("ADMIN")
                                 .requestMatchers(mvc.pattern("/h2-console/**")).permitAll()
