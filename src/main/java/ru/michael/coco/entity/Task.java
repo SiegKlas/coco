@@ -21,4 +21,7 @@ public class Task {
 
     @Column(name = "task_path")
     private String taskPath;
+
+    @OneToOne(mappedBy = "task")
+    private Chat chat;
 }

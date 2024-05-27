@@ -10,6 +10,6 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(mappedBy = "chat")
+    @OneToOne
     private Task task;
 }

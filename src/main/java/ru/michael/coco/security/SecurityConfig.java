@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
-import ru.michael.coco.user.UserRepository;
+import ru.michael.coco.repository.UserRepository;
 
 @Configuration
 public class SecurityConfig {
@@ -37,9 +37,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         (authz) -> authz
                                 .requestMatchers(mvc.pattern("/ws/**")).permitAll()
-                                .requestMatchers(mvc.pattern("/teacher/**")).permitAll()
-                                .requestMatchers(mvc.pattern("/overseer/**")).permitAll()
-                                .requestMatchers(mvc.pattern("/files"), mvc.pattern("/files/upload")).hasRole("ADMIN")
+                                .requestMatchers(mvc.pattern("/teacher/**")).hasRole("TEACHER")
+                                .requestMatchers(mvc.pattern("/overseer/**")).hasRole("OVERSEER")
                                 .requestMatchers(mvc.pattern("/h2-console/**")).permitAll()
                                 .requestMatchers(mvc.pattern("/login")).permitAll()
                                 .requestMatchers(mvc.pattern("/"), mvc.pattern("/**")).authenticated()

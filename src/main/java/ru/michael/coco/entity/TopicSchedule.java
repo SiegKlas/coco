@@ -10,15 +10,17 @@ public class TopicSchedule {
     private TopicScheduleId id;
 
     @ManyToOne
+    @MapsId("scheduleId")
+    @JoinColumn(name = "schedule_id")
+    private Schedule schedule;
+
+    @ManyToOne
     @MapsId("topicId")
     @JoinColumn(name = "topic_id")
     private Topic topic;
 
     @ManyToOne
-    @JoinColumn(name = "schedule_id")
-    private Schedule schedule;
-
-    @ManyToOne
+    @MapsId("userId")
     @JoinColumn(name = "user_id")
     private User user;
 }
