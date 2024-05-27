@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.michael.coco.entity.Group;
 import ru.michael.coco.entity.GroupUser;
-import ru.michael.coco.entity.GroupUserId;
 import ru.michael.coco.entity.User;
 import ru.michael.coco.repository.GroupRepository;
 import ru.michael.coco.repository.GroupUserRepository;
@@ -60,48 +59,26 @@ public class GroupService {
         });
     }
 
-    public void addUserToGroup(User user, Group group) {
-        GroupUserId groupUserId = new GroupUserId();
-        groupUserId.setGroup(group);
-        groupUserId.setUser(user);
-
-        GroupUser groupUser = new GroupUser();
-        groupUser.setId(groupUserId);
-        groupUser.setGroup(group);
-        groupUser.setUser(user);
-
-        groupUserRepository.save(groupUser);
-    }
-
     public void assignUsersToGroup(Group group, Long teacherId, List<Long> studentIds) {
         groupUserRepository.deleteAllByGroup(group);
 
         if (teacherId != null) {
             User teacher = userRepository.findById(teacherId).orElseThrow(() -> new IllegalArgumentException("Teacher not found"));
-            GroupUserId groupUserId = new GroupUserId();
-            groupUserId.setGroup(group);
-            groupUserId.setUser(teacher);
-
-            GroupUser groupUser = new GroupUser();
-            groupUser.setId(groupUserId);
-            groupUser.setGroup(group);
-            groupUser.setUser(teacher);
+            GroupUser groupUser = new GroupUser(group, teacher);
             groupUserRepository.save(groupUser);
         }
 
         if (studentIds != null && !studentIds.isEmpty()) {
             for (Long studentId : studentIds) {
                 User student = userRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("Student not found"));
-                GroupUserId groupUserId = new GroupUserId();
-                groupUserId.setGroup(group);
-                groupUserId.setUser(student);
-
-                GroupUser groupUser = new GroupUser();
-                groupUser.setId(groupUserId);
-                groupUser.setGroup(group);
-                groupUser.setUser(student);
+                GroupUser groupUser = new GroupUser(group, student);
                 groupUserRepository.save(groupUser);
             }
         }
+    }
+
+    public void addUserToGroup(User user, Group group) {
+        GroupUser groupUser = new GroupUser(group, user);
+        groupUserRepository.save(groupUser);
     }
 }

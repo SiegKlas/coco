@@ -83,10 +83,7 @@ public class OverseerController {
     public String createUser(@ModelAttribute UserDto userDto) {
         User user = userMapper.toEntity(userDto);
         user = userService.createUser(user);
-        for (Long groupId : userDto.getGroupIds()) {
-            Group group = groupService.getGroupById(groupId).orElseThrow(() -> new IllegalArgumentException("Group not found"));
-            groupService.addUserToGroup(user, group);
-        }
+        userService.updateUserGroups(user, userDto.getGroupIds());
         return "redirect:/overseer/users";
     }
 
@@ -94,11 +91,7 @@ public class OverseerController {
     public String updateUser(@ModelAttribute UserDto userDto) {
         User user = userMapper.toEntity(userDto);
         user = userService.updateUser(user);
-        // Обновление групп пользователя
-        for (Long groupId : userDto.getGroupIds()) {
-            Group group = groupService.getGroupById(groupId).orElseThrow(() -> new IllegalArgumentException("Group not found"));
-            groupService.addUserToGroup(user, group);
-        }
+        userService.updateUserGroups(user, userDto.getGroupIds());
         return "redirect:/overseer/users";
     }
 

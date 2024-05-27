@@ -1,6 +1,7 @@
 package ru.michael.coco.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -9,11 +10,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @Entity
 @NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "\"user\"")
 public class User implements UserDetails {
     @Id
@@ -63,12 +64,6 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public List<Group> getGroups() {
-        return groupUsers.stream()
-                .map(GroupUser::getGroup)
-                .collect(Collectors.toList());
     }
 
     public void addGroupUser(GroupUser groupUser) {

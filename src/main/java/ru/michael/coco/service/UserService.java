@@ -4,7 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.michael.coco.entity.Group;
+import ru.michael.coco.entity.GroupUser;
 import ru.michael.coco.entity.User;
+import ru.michael.coco.repository.GroupRepository;
 import ru.michael.coco.repository.UserRepository;
 
 import java.util.List;
@@ -15,11 +18,13 @@ import java.util.Optional;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final GroupRepository groupRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, GroupRepository groupRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.groupRepository = groupRepository;
     }
 
     public User createUser(User user) {
@@ -56,5 +61,15 @@ public class UserService {
 
     public List<User> getAllStudents() {
         return userRepository.findByRole(User.Role.STUDENT);
+    }
+
+    public void updateUserGroups(User user, List<Long> groupIds) {
+        user.getGroupUsers().clear();
+        for (Long groupId : groupIds) {
+            Group group = groupRepository.findById(groupId).orElseThrow(() -> new IllegalArgumentException("Group not found"));
+            GroupUser groupUser = new GroupUser(group, user);
+            user.addGroupUser(groupUser);
+        }
+        userRepository.save(user);
     }
 }

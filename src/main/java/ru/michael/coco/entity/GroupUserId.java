@@ -1,20 +1,26 @@
 package ru.michael.coco.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
 @Data
 @Embeddable
+@NoArgsConstructor
+@AllArgsConstructor
 public class GroupUserId implements Serializable {
-    @ManyToOne
-    @JoinColumn(name = "group_id")
-    private Group group;
+    @Column(name = "group_id")
+    private Long groupId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Long userId;
+
+    public GroupUserId(Group group, User user) {
+        this.groupId = group.getId();
+        this.userId = user.getId();
+    }
 }
