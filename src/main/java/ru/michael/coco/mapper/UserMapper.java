@@ -20,6 +20,9 @@ public interface UserMapper {
     })
     UserDto toDto(User user);
 
+    @Mappings({
+            @Mapping(target = "groupUsers", ignore = true)  // Чтобы избежать проблем с маппингом groupUsers
+    })
     User toEntity(UserDto userDto);
 
     @Named("groupUserToGroupIds")

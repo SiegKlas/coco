@@ -52,15 +52,19 @@ public class OverseerController {
     public String createGroup(@ModelAttribute GroupDto groupDto) {
         Group group = groupMapper.toEntity(groupDto);
         group = groupService.createGroup(group);
-        groupService.assignUsersToGroup(group, groupDto.getTeacherId(), groupDto.getStudentIds());
+        groupService.updateGroupUsers(group, groupDto.getTeacherId(), groupDto.getStudentIds());
         return "redirect:/overseer/groups";
     }
 
     @PostMapping("/groups/update")
     public String updateGroup(@ModelAttribute GroupDto groupDto) {
-        Group group = groupMapper.toEntity(groupDto);
-        group = groupService.updateGroup(group);
-        groupService.assignUsersToGroup(group, groupDto.getTeacherId(), groupDto.getStudentIds());
+        Group existingGroup = groupService.getGroupById(groupDto.getId()).orElseThrow(() -> new IllegalArgumentException("Group not found"));
+
+        existingGroup.setName(groupDto.getName());
+
+        Group updatedGroup = groupService.updateGroup(existingGroup);
+        groupService.updateGroupUsers(updatedGroup, groupDto.getTeacherId(), groupDto.getStudentIds());
+
         return "redirect:/overseer/groups";
     }
 
@@ -89,9 +93,15 @@ public class OverseerController {
 
     @PostMapping("/users/update")
     public String updateUser(@ModelAttribute UserDto userDto) {
-        User user = userMapper.toEntity(userDto);
-        user = userService.updateUser(user);
-        userService.updateUserGroups(user, userDto.getGroupIds());
+        User existingUser = userService.getUserById(userDto.getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        existingUser.setUsername(userDto.getUsername());
+        existingUser.setEmail(userDto.getEmail());
+        existingUser.setRole(userDto.getRole());
+
+        User updatedUser = userService.updateUser(existingUser);
+        userService.updateUserGroups(updatedUser, userDto.getGroupIds());
+
         return "redirect:/overseer/users";
     }
 

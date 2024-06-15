@@ -59,28 +59,28 @@ public class GroupService {
         });
     }
 
-    public void assignUsersToGroup(Group group, Long teacherId, List<Long> studentIds) {
-        // Получаем текущие записи GroupUser для данной группы
-        List<GroupUser> currentGroupUsers = groupUserRepository.findByGroup(group);
+    public void updateGroupUsers(Group group, Long teacherId, List<Long> studentIds) {
+        Group managedGroup = groupRepository.findById(group.getId()).orElseThrow(() -> new IllegalArgumentException("Group not found"));
+        managedGroup.getGroupUsers().clear();
+        groupRepository.save(managedGroup);
 
-        // Удаляем старые записи GroupUser
-        groupUserRepository.deleteAll(currentGroupUsers);
-
-        // Добавляем новую запись для учителя, если он есть
+        // Добавление учителя
         if (teacherId != null) {
             User teacher = userRepository.findById(teacherId).orElseThrow(() -> new IllegalArgumentException("Teacher not found"));
-            GroupUser groupUser = new GroupUser(group, teacher);
-            groupUserRepository.save(groupUser);
+            GroupUser groupUser = new GroupUser(managedGroup, teacher);
+            managedGroup.addGroupUser(groupUser);
         }
 
-        // Добавляем новые записи для студентов, если они есть
+        // Добавление студентов
         if (studentIds != null && !studentIds.isEmpty()) {
             for (Long studentId : studentIds) {
                 User student = userRepository.findById(studentId).orElseThrow(() -> new IllegalArgumentException("Student not found"));
-                GroupUser groupUser = new GroupUser(group, student);
-                groupUserRepository.save(groupUser);
+                GroupUser groupUser = new GroupUser(managedGroup, student);
+                managedGroup.addGroupUser(groupUser);
             }
         }
+
+        groupRepository.save(managedGroup);
     }
 
     public void addUserToGroup(User user, Group group) {

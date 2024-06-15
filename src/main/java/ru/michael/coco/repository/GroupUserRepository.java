@@ -16,4 +16,6 @@ public interface GroupUserRepository extends JpaRepository<GroupUser, GroupUserI
     List<GroupUser> findByGroup(Group group);
 
     void deleteByGroupAndUser(Group group, User user);
+
+    List<GroupUser> findByUser(User user);
 }

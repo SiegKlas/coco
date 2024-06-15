@@ -31,8 +31,6 @@
                     <li th:each="groupId : ${user.groupIds}">
                         <span th:each="group : ${groups}" th:if="${group.id == groupId}" th:text="${group.name}"></span>
                     </li>
-                    <li th:each="group : ${groups}" th:if="${group.teacherId == user.id}" th:text="${group.name}"
-                        th:unless="${group.id == user.groupIds}"></li>
                 </ul>
             </td>
             <td th:text="${user.email}"></td>

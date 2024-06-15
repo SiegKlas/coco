@@ -8,6 +8,7 @@ import ru.michael.coco.entity.Group;
 import ru.michael.coco.entity.GroupUser;
 import ru.michael.coco.entity.User;
 import ru.michael.coco.repository.GroupRepository;
+import ru.michael.coco.repository.GroupUserRepository;
 import ru.michael.coco.repository.UserRepository;
 
 import java.util.List;
@@ -17,14 +18,16 @@ import java.util.Optional;
 @Transactional
 public class UserService {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final GroupRepository groupRepository;
+    private final GroupUserRepository groupUserRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, GroupRepository groupRepository) {
+    public UserService(UserRepository userRepository, GroupRepository groupRepository, GroupUserRepository groupUserRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
         this.groupRepository = groupRepository;
+        this.groupUserRepository = groupUserRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User createUser(User user) {
@@ -64,12 +67,18 @@ public class UserService {
     }
 
     public void updateUserGroups(User user, List<Long> groupIds) {
-        user.getGroupUsers().clear();
-        for (Long groupId : groupIds) {
-            Group group = groupRepository.findById(groupId).orElseThrow(() -> new IllegalArgumentException("Group not found"));
-            GroupUser groupUser = new GroupUser(group, user);
-            user.addGroupUser(groupUser);
+        User managedUser = userRepository.findById(user.getId()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        managedUser.getGroupUsers().clear();
+        userRepository.save(managedUser);
+
+        if (groupIds != null && !groupIds.isEmpty()) {
+            for (Long groupId : groupIds) {
+                Group group = groupRepository.findById(groupId).orElseThrow(() -> new IllegalArgumentException("Group not found"));
+                GroupUser groupUser = new GroupUser(group, managedUser);
+                managedUser.addGroupUser(groupUser);
+            }
         }
-        userRepository.save(user);
+
+        userRepository.save(managedUser);
     }
 }
