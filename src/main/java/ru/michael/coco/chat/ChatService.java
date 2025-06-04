@@ -31,7 +31,12 @@ public class ChatService {
 
     public Chat createChat(User student, Task task) {
         Group group = student.getGroups().stream().findFirst().orElseThrow(() -> new RuntimeException("User is not in a group"));
-        Bank activeBank = group.getBanks().stream().findFirst().orElseThrow(() -> new RuntimeException("Group has no active bank"));
+        Bank activeBank = group.getActiveBank();
+        if (activeBank == null) {
+            activeBank = group.getBanks().stream()
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Group has no banks"));
+        }
 
         var chatters = new ArrayList<User>();
         chatters.add(activeBank.getGroup().getTeacher());
